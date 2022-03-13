@@ -6,6 +6,7 @@
 #include "udp_message.h"
 
 #include <thread>
+#include <vector>
 
 namespace evpp {
 

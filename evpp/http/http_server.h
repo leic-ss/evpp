@@ -7,6 +7,8 @@
 #include "evpp/thread_dispatch_policy.h"
 #include "evpp/server_status.h"
 
+#include <vector>
+
 namespace evpp {
 class EventLoop;
 class EventLoopThreadPool;

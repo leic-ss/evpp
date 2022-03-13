@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     } 
     evpp::evpphttp::Service server(std::string("0.0.0.0:") + std::to_string(g_port), "test", thread_num);
     server.RegisterHandler("/echo", &DefaultHandler);
+    server.Init();
     if (!server.Start()) {
 		std::cout << "start serv failed\n";
 		return -1;

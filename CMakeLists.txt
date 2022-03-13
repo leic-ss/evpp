@@ -48,9 +48,9 @@ string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 if (UNIX)
     SET(CMAKE_CXX_FLAGS_DEBUG   "-O0 -g -ggdb -D_DEBUG -DGOOGLE_STRIP_LOG=0")
     SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -ggdb -DNDEBUG -DGOOGLE_STRIP_LOG=1")
-    SET(DEPENDENT_LIBRARIES event glog pthread)
+    # SET(DEPENDENT_LIBRARIES event glog pthread)
 else (UNIX)
-    SET(DEPENDENT_LIBRARIES event glog)
+    # SET(DEPENDENT_LIBRARIES event glog)
 endif (UNIX)
 
 # Set to true if https support is needed.
@@ -62,6 +62,8 @@ if (HTTPS)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEVPP_HTTP_SERVER_SUPPORTS_SSL")
 endif (HTTPS)
 
+list(APPEND DEPENDENT_LIBRARIES pthread event)
+link_directories(/apps/mdsenv/deps/lib)
 
 if (CMAKE_BENCHMARK_TESTING)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DH_BENCHMARK_TESTING=1")
@@ -88,7 +90,7 @@ message (STATUS "THRIFT_LIBRARY " ${THRIFT_LIBRARY})
 
 add_subdirectory (evpp)
 add_subdirectory (apps)
-add_subdirectory (labs)
+#add_subdirectory (labs)
 
 if (NOT EVPP_VCPKG_BUILD)
     add_subdirectory (test)
