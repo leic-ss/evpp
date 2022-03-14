@@ -47,13 +47,13 @@ if (UNIX)
     target_link_libraries(evpp_concurrentqueue_static ${DEPENDENT_LIBRARIES})
 
     set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-    include (utils)
-    include (packages)
-    set_target_properties (
-        evpp evpp_boost evpp_concurrentqueue PROPERTIES
-        VERSION     "${PACKAGE_VERSION}"
-        SOVERSION   "${PACKAGE_SOVERSION}"
-    )
+    # include (utils)
+    # include (packages)
+    # set_target_properties (
+    #    evpp evpp_boost evpp_concurrentqueue PROPERTIES
+    #    VERSION     "${PACKAGE_VERSION}"
+    #    SOVERSION   "${PACKAGE_SOVERSION}"
+    # )
 
     install (
       TARGETS evpp evpp_static evpp_lite_static evpp_boost evpp_boost_static evpp_concurrentqueue evpp_concurrentqueue_static
