@@ -14,6 +14,10 @@ void DefaultHandler(evpp::EventLoop* loop,
 		{"Content-Type", "application/octet-stream"},
         {"Server", "evpp"}
 	};
+
+    // static int count = 0;
+    // if (count++ % 2 == 1) sleep(30);
+
     cb(200, feild_value, oss.str());
 }
 
@@ -37,7 +41,7 @@ int main(int argc, char* argv[]) {
     } else if (argc == 3) {
         g_port = atoi(argv[1]);
         thread_num = atoi(argv[2]);
-    } 
+    }
     evpp::evpphttp::Service server(std::string("0.0.0.0:") + std::to_string(g_port), "test", thread_num);
     server.RegisterHandler("/echo", &DefaultHandler);
     server.Init();
