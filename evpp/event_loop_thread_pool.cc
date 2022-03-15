@@ -7,7 +7,7 @@ namespace evpp {
 EventLoopThreadPool::EventLoopThreadPool(EventLoop* base_loop, uint32_t thread_number)
     : base_loop_(base_loop),
       thread_num_(thread_number) {
-    DLOG_TRACE << "thread_num=" << thread_num() << " base loop=" << base_loop_;
+    DLOG_TRACE << "thread_num=" << thread_num() << " base loop=" << (base_loop_ ? "base_loop_" : "NULL");
 }
 
 EventLoopThreadPool::~EventLoopThreadPool() {
@@ -18,7 +18,7 @@ EventLoopThreadPool::~EventLoopThreadPool() {
 
 bool EventLoopThreadPool::Start(bool wait_thread_started) {
     status_.store(kStarting);
-    DLOG_TRACE << "thread_num=" << thread_num() << " base loop=" << base_loop_ << " wait_thread_started=" << wait_thread_started;
+    DLOG_TRACE << "thread_num=" << thread_num() << " base loop=" << (base_loop_ ? "base_loop_" : "NULL") << " wait_thread_started=" << wait_thread_started;
 
     if (thread_num_ == 0) {
         status_.store(kRunning);

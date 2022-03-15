@@ -43,22 +43,22 @@
 // #define CHECK_NOTnullptr(val) LOG_ERROR << "'" #val "' Must be non nullptr";
 // #endif
 
-#define LOG_TRACE std::cout << __FILE__ << ":" << __LINE__ << " "
-#define LOG_DEBUG std::cout << __FILE__ << ":" << __LINE__ << " "
-#define LOG_INFO  std::cout << __FILE__ << ":" << __LINE__ << " "
-#define LOG_WARN  std::cout << __FILE__ << ":" << __LINE__ << " "
-#define LOG_ERROR std::cout << __FILE__ << ":" << __LINE__ << " "
-#define LOG_FATAL std::cout << __FILE__ << ":" << __LINE__ << " "
+#define LOG_TRACE std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define LOG_DEBUG std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define LOG_INFO  std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define LOG_WARN  std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define LOG_ERROR std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define LOG_FATAL std::cout << __FILE__ << ":" << __LINE__ << "\n"
 
-#define DLOG_TRACE std::cout << __FILE__ << ":" << __LINE__ << " "
-#define DLOG_DEBUG std::cout << __FILE__ << ":" << __LINE__ << " "
-#define DLOG_INFO  std::cout << __FILE__ << ":" << __LINE__ << " "
-#define DLOG_WARN  std::cout << __FILE__ << ":" << __LINE__ << " "
-#define DLOG_ERROR std::cout << __FILE__ << ":" << __LINE__ << " "
-#define DLOG_FATAL std::cout << __FILE__ << ":" << __LINE__ << " "
+#define DLOG_TRACE std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define DLOG_DEBUG std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define DLOG_INFO  std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define DLOG_WARN  std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define DLOG_ERROR std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define DLOG_FATAL std::cout << __FILE__ << ":" << __LINE__ << "\n"
 
-#define LOG(WARNING) std::cout << __FILE__ << ":" << __LINE__ << " "
-#define LOG_EVERY_N(WARNING, n) std::cout << __FILE__ << ":" << __LINE__ << " "
+#define LOG(WARNING) std::cout << __FILE__ << ":" << __LINE__ << "\n"
+#define LOG_EVERY_N(WARNING, n) std::cout << __FILE__ << ":" << __LINE__ << "\n"
 
 #define CHECK_NOTnullptr(val) LOG_ERROR << "'" #val "' Must be non nullptr";
 

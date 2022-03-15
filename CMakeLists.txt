@@ -47,6 +47,14 @@ endif (UNIX)
 
 string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
+option(CMAKE_USE_OLD_GDB "cmake to support old gdb" OFF)
+if(CMAKE_USE_OLD_GDB)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-3")
+    message(STATUS "CMAKE_USE_OLD_GDB : Enabled")
+elseif(NOT CMAKE_USE_OLD_GDB)
+    message(STATUS "CMAKE_USE_OLD_GDB : Disabled")
+endif()
+
 if (UNIX)
     SET(CMAKE_CXX_FLAGS_DEBUG   "-O0 -g -ggdb -D_DEBUG -DGOOGLE_STRIP_LOG=0")
     SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -ggdb -DNDEBUG -DGOOGLE_STRIP_LOG=1")
@@ -83,6 +91,7 @@ find_library(THRIFT_LIBRARY NAMES thrift)
 
 message (STATUS "This is BINARY dir " ${PROJECT_BINARY_DIR})
 message (STATUS "This is SOURCE dir " ${PROJECT_SOURCE_DIR})
+message (STATUS "CMAKE_INSTALL_PREFIX : " ${CMAKE_INSTALL_PREFIX})
 message (STATUS "CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS})
 message (STATUS "EXECUTABLE_OUTPUT_PATH " ${EXECUTABLE_OUTPUT_PATH})
 message (STATUS "LIBRARY_OUTPUT_PATH " ${LIBRARY_OUTPUT_PATH})
@@ -91,6 +100,7 @@ message (STATUS "THRIFT_INCLUDE_DIR " ${THRIFT_INCLUDE_DIR})
 message (STATUS "THRIFT_LIBRARY " ${THRIFT_LIBRARY})
 
 add_subdirectory (evpp)
+add_subdirectory (rpc)
 add_subdirectory (apps)
 #add_subdirectory (labs)
 
