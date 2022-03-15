@@ -13,16 +13,12 @@ int main(int argc, char* argv[]) {
     	return -1;
     }
 
-    sleep(1);
-
     rpc2::ContextXPtr ctx = std::make_shared<rpc2::ClientCtx>();
     ctx->convert<rpc2::ClientCtx>()->request = "test message!";
 
     client->Request(ctx, [] (rpc2::ContextXPtr) {
 
     }, 200);
-
-    sleep(1);
 
     client.reset();
     return 0;

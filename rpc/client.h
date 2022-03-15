@@ -1,7 +1,7 @@
 #pragma once
 
 #include <evpp/tcp_client.h>
-#include <evpp/event_loop_thread_pool.h>
+#include <evpp/event_loop_thread.h>
 #include <evpp/buffer.h>
 #include <evpp/tcp_conn.h>
 
@@ -126,7 +126,7 @@ private:
 
 	std::unordered_map<uint32_t, Async::ptr> ctxs;
 
-	std::shared_ptr<evpp::EventLoopThreadPool> tpool_;
+	evpp::EventLoopThread* event_loop_thread_{nullptr};
 	std::shared_ptr<evpp::TCPClient> tcp_client_ptr_{nullptr};
 };
 

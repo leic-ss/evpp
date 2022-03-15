@@ -43,19 +43,22 @@ Client::Async::ptr Client::erase(uint32_t seq)
 
 Client::~Client()
 {
-	tpool_->Stop();
-    while (!tpool_->IsStopped()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+	if (event_loop_thread_) {
+        event_loop_thread_->Stop();
+
+        delete event_loop_thread_;
+        event_loop_thread_ = nullptr;
     }
-    tpool_.reset();
 }
 
 bool Client::Init()
 {
-	tpool_.reset(new evpp::EventLoopThreadPool(nullptr, 1));
-    tpool_->Start(true);
+	if (event_loop_thread_) return false;
 
-	tcp_client_ptr_ = std::make_shared<evpp::TCPClient>(tpool_->GetNextLoop(), addr_, "rpc_c");
+    event_loop_thread_ = new evpp::EventLoopThread();
+    if (!event_loop_thread_->Start()) return false;
+
+	tcp_client_ptr_ = std::make_shared<evpp::TCPClient>(event_loop_thread_->loop(), addr_, "rpc_c");
 	if (!tcp_client_ptr_) {
 		return false;
 	}
