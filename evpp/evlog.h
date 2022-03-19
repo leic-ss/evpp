@@ -38,8 +38,8 @@ You may obtain a copy of the License at
 
 namespace evpp {
 
-#ifndef _BASE_LOGGER_
-#define _BASE_LOGGER_
+#ifndef _BASE_EV_LOGGER_
+#define _BASE_EV_LOGGER_
 
 #define EVLOG_FILE_NAME(x) strrchr( (x),'/')?strrchr( (x) ,'/')+1:(x)
 
