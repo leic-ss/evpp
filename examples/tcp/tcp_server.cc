@@ -13,9 +13,9 @@ int main(int argc, char* argv[]) {
     });
     server.SetConnectionCallback([](const evpp::TCPConnPtr& conn) {
         if (conn->IsConnected()) {
-            LOG_INFO << "A new connection from " << conn->remote_addr();
+            // LOG_INFO << "A new connection from " << conn->remote_addr();
         } else {
-            LOG_INFO << "Lost the connection from " << conn->remote_addr();
+            // LOG_INFO << "Lost the connection from " << conn->remote_addr();
         }
     });
     server.Init();

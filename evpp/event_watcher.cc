@@ -5,7 +5,7 @@
 #include "evpp/libevent.h"
 #include "evpp/event_watcher.h"
 #include "evpp/event_loop.h"
-#include "evpp/logging.h"
+#include "evpp/evlog.h"
 
 namespace evpp {
 
@@ -56,7 +56,7 @@ bool EventWatcher::Watch(Duration timeout) {
         // When InvokerTimer::periodic_ == true, EventWatcher::Watch will be called many times
         // so we need to remove it from event_base before we add it into event_base
         if (EventDel(event_) != 0) {
-            LOG_ERROR << "event_del failed. fd=" << this->event_->ev_fd << " event_=" << event_;
+            _log_err(myLog, "event_del failed. fd=%d", event_->ev_fd);
             // TODO how to deal with it when failed?
         }
         attached_ = false;
@@ -64,7 +64,7 @@ bool EventWatcher::Watch(Duration timeout) {
 
     assert(!attached_);
     if (EventAdd(event_, timeoutval) != 0) {
-        LOG_ERROR << "event_add failed. fd=" << this->event_->ev_fd << " event_=" << event_;
+        _log_err(myLog, "event_add failed. fd=%d", this->event_->ev_fd);
         return false;
     }
     attached_ = true;
@@ -124,7 +124,7 @@ bool PipeEventWatcher::DoInit() {
 
     if (evutil_socketpair(AF_UNIX, SOCK_STREAM, 0, pipe_) < 0) {
         int err = errno;
-        LOG_ERROR << "create socketpair ERROR errno=" << err << " " << strerror(err);
+        _log_err(myLog, "create socketpair ERROR errno=%d err=%s", err, strerror(err));
         goto failed;
     }
 
@@ -150,7 +150,7 @@ void PipeEventWatcher::DoClose() {
 }
 
 void PipeEventWatcher::HandlerFn(evpp_socket_t fd, short /*which*/, void* v) {
-    LOG_INFO << "PipeEventWatcher::HandlerFn fd=" << fd << " v=" << v;
+    // _log_info(myLog, "PipeEventWatcher::HandlerFn fd=%d", fd);
     PipeEventWatcher* e = (PipeEventWatcher*)v;
 #ifdef H_BENCHMARK_TESTING
     // Every time we only read 1 byte for testing the IO event performance.

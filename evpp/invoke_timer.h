@@ -2,6 +2,7 @@
 
 #include "evpp/inner_pre.h"
 #include "evpp/duration.h"
+#include "evpp/evlog.h"
 
 namespace evpp {
 class EventLoop;
@@ -33,6 +34,7 @@ public:
                                  bool periodic);
     ~InvokeTimer();
 
+    void setLogger(logger* log_) { myLog = log_; }
     // It is thread safe.
     // Start this timer.
     void Start();
@@ -57,6 +59,8 @@ private:
     std::unique_ptr<TimerEventWatcher> timer_;
     bool periodic_;
     std::shared_ptr<InvokeTimer> self_; // Hold myself
+
+    logger* myLog{nullptr};
 };
 
 }

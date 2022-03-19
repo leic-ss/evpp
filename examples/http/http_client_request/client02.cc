@@ -11,12 +11,12 @@
 
 static int responsed = 0;
 static void HandleHTTPResponse(const std::shared_ptr<evpp::httpc::Response>& response, evpp::httpc::GetRequest* request) {
-    LOG_INFO << "http_code=" << response->http_code()
-        << " URL=http://" << request->host() << request->uri()
-        << " [" << response->body().ToString() << "]";
+    // LOG_INFO << "http_code=" << response->http_code()
+    //     << " URL=http://" << request->host() << request->uri()
+    //     << " [" << response->body().ToString() << "]";
     const char* header = response->FindHeader("Connection");
     if (header) {
-        LOG_INFO << "HTTP HEADER Connection=" << header;
+        // LOG_INFO << "HTTP HEADER Connection=" << header;
     }
     responsed++;
     assert(request == response->request());
@@ -37,6 +37,6 @@ int main() {
     }
 
     t.Stop(true);
-    LOG_INFO << "EventLoopThread stopped.";
+    // LOG_INFO << "EventLoopThread stopped.";
     return 0;
 }

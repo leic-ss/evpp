@@ -1,6 +1,7 @@
 #pragma once
 
 #include "evpp/event_loop_thread.h"
+#include "evpp/evlog.h"
 
 #include <atomic>
 #include <vector>
@@ -13,6 +14,7 @@ public:
     EventLoopThreadPool(EventLoop* base_loop, uint32_t thread_num);
     ~EventLoopThreadPool();
 
+    void setLogger(logger* log_) { myLog = log_; }
     bool Start(bool wait_thread_started = false);
 
     void Stop(bool wait_thread_exited = false);
@@ -36,7 +38,7 @@ private:
     void OnThreadStarted(uint32_t count);
     void OnThreadExited(uint32_t count);
 
-private:
+protected:
     EventLoop* base_loop_;
 
     uint32_t thread_num_ = 0;
@@ -46,5 +48,7 @@ private:
 
     typedef std::shared_ptr<EventLoopThread> EventLoopThreadPtr;
     std::vector<EventLoopThreadPtr> threads_;
+
+    logger* myLog{nullptr};
 };
 }

@@ -27,7 +27,7 @@ public:
 
 private:
     void OnConnection(const evpp::TCPConnPtr& conn) {
-        LOG_INFO << conn->AddrToString() << " is " << (conn->IsConnected() ? "UP" : "DOWN");
+        // LOG_INFO << conn->AddrToString() << " is " << (conn->IsConnected() ? "UP" : "DOWN");
         if (conn->IsConnected()) {
             connections_.insert(conn);
         } else {

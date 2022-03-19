@@ -13,13 +13,13 @@ int main(int argc, char* argv[]) {
     evpp::TCPClient client(&loop, addr, "TCPPingPongClient");
     client.SetMessageCallback([&loop, &client](const evpp::TCPConnPtr& conn,
                                evpp::Buffer* msg) {
-        LOG_TRACE << "Receive a message [" << msg->ToString() << "]";
+        // LOG_TRACE << "Receive a message [" << msg->ToString() << "]";
         client.Disconnect();
     });
 
     client.SetConnectionCallback([](const evpp::TCPConnPtr& conn) {
         if (conn->IsConnected()) {
-            LOG_INFO << "Connected to " << conn->remote_addr();
+            // LOG_INFO << "Connected to " << conn->remote_addr();
             conn->Send("hello");
         } else {
             conn->loop()->Stop();

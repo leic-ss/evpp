@@ -38,7 +38,7 @@ static void RequestHandler201(evpp::EventLoop* loop, const evpp::http::ContextPt
 }
 
 static void RequestHandler909(evpp::EventLoop* loop, const evpp::http::ContextPtr& ctx, const evpp::http::HTTPSendResponseCallback& cb) {
-    LOG_INFO << "RequestHandler909";
+    // LOG_INFO << "RequestHandler909";
     std::stringstream oss;
     oss << "func=" << __FUNCTION__ << " OK"
         << " ip=" << ctx->remote_ip() << "\n"
@@ -301,7 +301,7 @@ static void TestDefaultHandler() {
 
 TEST_UNIT(testHTTPServerNoDefaultHandler) {
     for (int i = 0; i < 3; ++i) {
-        LOG_INFO << "Running testHTTPServer i=" << i;
+        // LOG_INFO << "Running testHTTPServer i=" << i;
         evpp::http::Server ph(i);
         bool r = ph.Init(g_listening_port) && ph.Start();
         H_TEST_ASSERT(r);
@@ -314,7 +314,7 @@ TEST_UNIT(testHTTPServerNoDefaultHandler) {
 
 TEST_UNIT(testHTTPServer) {
     for (int i = 0; i < 5; ++i) {
-        LOG_INFO << "Running testHTTPServer i=" << i;
+        // LOG_INFO << "Running testHTTPServer i=" << i;
         evpp::http::Server ph(i);
         ph.RegisterDefaultHandler(&DefaultRequestHandler);
         ph.RegisterHandler("/push/boot", &RequestHandler);
@@ -330,7 +330,7 @@ TEST_UNIT(testHTTPServer) {
 
 TEST_UNIT(testHTTPServer909) {
     for (int i = 0; i < 10; ++i) {
-        LOG_INFO << "Running testHTTPServer i=" << i;
+        // LOG_INFO << "Running testHTTPServer i=" << i;
         evpp::http::Server ph(i);
         ph.RegisterDefaultHandler(&DefaultRequestHandler);
         ph.RegisterHandler("/909", &RequestHandler909);

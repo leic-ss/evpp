@@ -4,6 +4,7 @@
 #include <evpp/event_loop_thread_pool.h>
 #include <evpp/buffer.h>
 #include <evpp/tcp_conn.h>
+#include "logger.h"
 
 class Client;
 
@@ -44,7 +45,7 @@ private:
     void OnConnection(const evpp::TCPConnPtr& conn);
 
     void OnMessage(const evpp::TCPConnPtr& conn, evpp::Buffer* buf) {
-        LOG_TRACE << "bytes_read=" << bytes_read_ << " bytes_writen=" << bytes_written_;
+        // LOG_TRACE << "bytes_read=" << bytes_read_ << " bytes_writen=" << bytes_written_;
         ++messages_read_;
         bytes_read_ += buf->size();
         bytes_written_ += buf->size();
@@ -66,13 +67,16 @@ public:
            int blockSize,
            int sessionCount,
            int timeout_sec,
-           int threadCount)
+           int threadCount,
+           evpp::logger* log_)
         : loop_(loop),
         session_count_(sessionCount),
         timeout_(timeout_sec),
         connected_count_(0) {
         loop->RunAfter(evpp::Duration(double(timeout_sec)), std::bind(&Client::HandleTimeout, this));
-        tpool_.reset(new evpp::EventLoopThreadPool(loop, threadCount));
+        auto evtp = new evpp::EventLoopThreadPool(loop, threadCount);
+        evtp->setLogger(log_);
+        tpool_.reset(evtp);
         tpool_->Start(true);
 
         for (int i = 0; i < blockSize; ++i) {
@@ -97,13 +101,13 @@ public:
 
     void OnConnect() {
         if (++connected_count_ == session_count_) {
-            LOG_WARN << "all connected";
+            // LOG_WARN << "all connected";
         }
     }
 
     void OnDisconnect(const evpp::TCPConnPtr& conn) {
         if (--connected_count_ == 0) {
-            LOG_WARN << "all disconnected";
+            // LOG_WARN << "all disconnected";
 
             int64_t totalBytesRead = 0;
             int64_t totalMessagesRead = 0;
@@ -111,12 +115,12 @@ public:
                 totalBytesRead += it->bytes_read();
                 totalMessagesRead += it->messages_read();
             }
-            LOG_WARN << totalBytesRead << " total bytes read";
-            LOG_WARN << totalMessagesRead << " total messages read";
-            LOG_WARN << static_cast<double>(totalBytesRead) / static_cast<double>(totalMessagesRead)
-                << " average message size";
-            LOG_WARN << static_cast<double>(totalBytesRead) / (timeout_ * 1024 * 1024)
-                << " MiB/s throughput";
+            // LOG_WARN << totalBytesRead << " total bytes read";
+            // LOG_WARN << totalMessagesRead << " total messages read";
+            // LOG_WARN << static_cast<double>(totalBytesRead) / static_cast<double>(totalMessagesRead)
+            //    << " average message size";
+            // LOG_WARN << static_cast<double>(totalBytesRead) / (timeout_ * 1024 * 1024)
+            //    << " MiB/s throughput";
             loop_->QueueInLoop(std::bind(&Client::Quit, this));
         }
     }
@@ -136,7 +140,7 @@ private:
     }
 
     void HandleTimeout() {
-        LOG_WARN << "stop";
+        // LOG_WARN << "stop";
         for (auto &it : sessions_) {
             it->Stop();
         }
@@ -174,10 +178,14 @@ int main(int argc, char* argv[]) {
     int sessionCount = atoi(argv[5]);
     int timeout = atoi(argv[6]);
 
+    evpp::logger* log = evpp::CCLogger::instance();
+    log->setLogLevel("TRAC");
+
     evpp::EventLoop loop;
+    loop.setLogger(log);
     std::string serverAddr = std::string(ip) + ":" + std::to_string(port);
 
-    Client client(&loop, serverAddr, blockSize, sessionCount, timeout, threadCount);
+    Client client(&loop, serverAddr, blockSize, sessionCount, timeout, threadCount, log);
     loop.Run();
     return 0;
 }

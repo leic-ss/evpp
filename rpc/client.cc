@@ -72,9 +72,9 @@ bool Client::Init()
 void Client::ConnectCallBack(const evpp::TCPConnPtr& conn)
 {
 	if (conn->IsConnected()) {
-		LOG_INFO << "Connected to " << conn->remote_addr();
+		// LOG_INFO << "Connected to " << conn->remote_addr();
 	} else {
-		LOG_INFO << "Connect Failed to " << conn->remote_addr();
+		// LOG_INFO << "Connect Failed to " << conn->remote_addr();
 	}
 
 	return ;
@@ -82,7 +82,7 @@ void Client::ConnectCallBack(const evpp::TCPConnPtr& conn)
 
 void Client::MessageCallBack(const evpp::TCPConnPtr& conn, evpp::Buffer* msg)
 {
-	LOG_TRACE << "Receive a message [" << msg->ToString() << "]";
+	// LOG_TRACE << "Receive a message [" << msg->ToString() << "]";
 
 	// find async and invoke
 

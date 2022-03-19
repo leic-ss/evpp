@@ -13,7 +13,7 @@
 #include "sys_addrinfo.h"
 #include "sys_sockets.h"
 #include "sockets.h"
-#include "logging.h"
+#include "evlog.h"
 
 struct event;
 namespace evpp {

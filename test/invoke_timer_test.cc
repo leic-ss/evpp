@@ -22,7 +22,7 @@ static void Handle() {
 }
 
 static void MyEventThread() {
-    LOG_INFO << "EventLoop is running ...";
+    // LOG_INFO << "EventLoop is running ...";
     loop = std::shared_ptr<evpp::EventLoop>(new evpp::EventLoop);
     loop->Run();
 }

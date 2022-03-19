@@ -7,6 +7,7 @@
 
 #include "evpp/thread_dispatch_policy.h"
 #include "evpp/server_status.h"
+#include "evpp/evlog.h"
 
 #include <map>
 
@@ -61,6 +62,8 @@ public:
               uint32_t thread_num);
     ~TCPServer();
 
+    void setLogger(logger* log_) { myLog = log_; }
+
     // @brief Do the initialization works here.
     //  It will create a nonblocking TCP socket, and bind with the give address
     //  then listen on it. If there is anything wrong it will return false.
@@ -98,6 +101,10 @@ public:
     const std::string& listen_addr() const {
         return listen_addr_;
     }
+
+protected:
+    logger* myLog{nullptr};
+
 private:
     void StopThreadPool();
     void StopInLoop(DoneCallback on_stopped_cb);

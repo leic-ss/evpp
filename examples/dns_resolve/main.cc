@@ -15,12 +15,12 @@ int main(int argc, char* argv[]) {
     evpp::EventLoop loop;
 
     auto fn_resolved = [&loop, &host](const std::vector <struct in_addr>& addrs) {
-        LOG_INFO << "Entering fn_resolved";
+        // LOG_INFO << "Entering fn_resolved";
         for (auto addr : addrs) {
             struct sockaddr_in saddr;
             memset(&saddr, 0, sizeof(saddr));
             saddr.sin_addr = addr;
-            LOG_INFO << "DNS resolved " << host << " ip " << evpp::sock::ToIP(evpp::sock::sockaddr_cast(&saddr));
+            // LOG_INFO << "DNS resolved " << host << " ip " << evpp::sock::ToIP(evpp::sock::sockaddr_cast(&saddr));
         }
 
         loop.RunAfter(evpp::Duration(0.5), [&loop]() { loop.Stop(); });

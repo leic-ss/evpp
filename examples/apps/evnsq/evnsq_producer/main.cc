@@ -8,7 +8,7 @@
 #include <getopt.h>
 
 int OnMessage(const evnsq::Message* msg) {
-    LOG_INFO << "Received a message, id=" << msg->id << " message=[" << msg->body.ToString() << "]";
+    // LOG_INFO << "Received a message, id=" << msg->id << " message=[" << msg->body.ToString() << "]";
     return 0;
 }
 
@@ -23,7 +23,7 @@ bool Publish(evnsq::Producer* producer) {
     if (!producer->Publish(topic1, msg)) {
         return false;
     }
-    //LOG_INFO << "Publish : [" << msg << "]";
+    //// LOG_INFO << "Publish : [" << msg << "]";
     std::vector<std::string> messages;
     messages.push_back(msg);
     messages.push_back(msg);

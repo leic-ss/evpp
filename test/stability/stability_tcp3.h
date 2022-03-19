@@ -16,10 +16,10 @@ namespace {
     void OnClientConnection(const evpp::TCPConnPtr& conn) {
         if (conn->IsConnected()) {
             conn->Send("hello");
-            LOG_INFO << "Send a message to server when connected.";
+            // LOG_INFO << "Send a message to server when connected.";
             connected = true;
         } else {
-            LOG_INFO << "Disconnected from " << conn->remote_addr();
+            // LOG_INFO << "Disconnected from " << conn->remote_addr();
         }
     }
 

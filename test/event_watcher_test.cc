@@ -87,7 +87,7 @@ namespace evsignal {
 static evpp::SignalEventWatcher* ev = nullptr;
 static bool g_event_handler_called = false;
 static void Handle(evpp::EventLoopThread* thread) {
-    LOG_INFO << "SIGINT caught.";
+    // LOG_INFO << "SIGINT caught.";
     g_event_handler_called = true;
     thread->Stop();
     delete ev; // make sure to initialize and delete in the same thread.
@@ -108,7 +108,7 @@ TEST_UNIT(testSignalEventWatcher) {
     ev = new evpp::SignalEventWatcher(SIGINT, loop, std::bind(&Handle, thread.get()));
     loop->RunInLoop(&WatchSignalInt);
     auto f = []() {
-        LOG_INFO << "Send SIGINT ...";
+        // LOG_INFO << "Send SIGINT ...";
 #ifdef H_OS_WINDOWS
         raise(SIGINT);
 #else

@@ -1,6 +1,7 @@
 #include <evpp/tcp_server.h>
 #include <evpp/buffer.h>
 #include <evpp/tcp_conn.h>
+#include "logger.h"
 
 void OnConnection(const evpp::TCPConnPtr& conn) {
     if (conn->IsConnected()) {
@@ -28,10 +29,15 @@ int main(int argc, char* argv[]) {
         thread_num = atoi(argv[2]);
     }
 
+    evpp::logger* log = evpp::CCLogger::instance();
+    log->setLogLevel("TRAC");
     evpp::EventLoop loop;
+    loop.setLogger(log);
+
     evpp::TCPServer server(&loop, addr, "TCPPingPongServer", thread_num);
     server.SetMessageCallback(&OnMessage);
     server.SetConnectionCallback(&OnConnection);
+    server.setLogger(log);
     server.Init();
     server.Start();
     loop.Run();

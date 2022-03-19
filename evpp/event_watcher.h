@@ -3,6 +3,7 @@
 #include "inner_pre.h"
 
 #include "duration.h"
+#include "evpp/evlog.h"
 
 struct event;
 struct event_base;
@@ -15,6 +16,7 @@ public:
 
     virtual ~EventWatcher();
 
+    void setLogger(logger* log_) { myLog = log_; }
     bool Init();
 
     // @note It MUST be called in the event thread.
@@ -47,6 +49,8 @@ protected:
     bool attached_;
     Handler handler_;
     Handler cancel_callback_;
+
+    logger* myLog{nullptr};
 };
 
 class EVPP_EXPORT PipeEventWatcher : public EventWatcher {

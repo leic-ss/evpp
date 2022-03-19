@@ -5,6 +5,7 @@
 
 #include "evpp/inner_pre.h"
 #include "evpp/server_status.h"
+#include "evpp/evlog.h"
 
 struct event_base;
 struct event;
@@ -22,6 +23,8 @@ public:
 
     EventLoopThread();
     ~EventLoopThread();
+
+    void setLogger(logger* log_) { myLog = log_; }
 
     // @param wait_thread_started - If it is true this method will block
     //  until the thread totally started
@@ -58,5 +61,7 @@ private:
     std::shared_ptr<std::thread> thread_; // Guard by mutex_
 
     std::string name_;
+
+    logger* myLog{nullptr};
 };
 }

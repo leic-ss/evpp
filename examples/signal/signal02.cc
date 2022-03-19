@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     auto f = [&ev, &loop]() {
         ev.reset(new evpp::SignalEventWatcher(
             SIGINT, &loop, []() {
-            LOG_INFO << "SIGINT caught.";
+            // LOG_INFO << "SIGINT caught.";
         }));
         ev->Init();
         ev->AsyncWait();

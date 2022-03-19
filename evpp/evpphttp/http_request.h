@@ -1,6 +1,8 @@
 #pragma once
 #include "evpp/buffer.h"
 #include "evpp/evpphttp/http_parser.h"
+#include "evpp/evlog.h"
+
 #include <map>
 namespace evpp {
 namespace evpphttp {
@@ -9,6 +11,7 @@ public:
     inline bool completed() const {
         return is_completed;
     }
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     HttpRequest();
     HttpRequest(HttpRequest & hr) {
         swap(hr);
@@ -145,6 +148,8 @@ private:
     bool send_continue_{false};
     http_parser_settings settings;
     http_parser_url  u;
+
+    std::shared_ptr<logger> myLog{nullptr};
 };
 }
 }

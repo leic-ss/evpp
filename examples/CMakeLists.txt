@@ -23,10 +23,10 @@ target_link_libraries(example_tcpecho ${LIBRARIES})
 add_executable(example_udpecho echo/udpecho/main.cc)
 target_link_libraries(example_udpecho ${LIBRARIES})
 
-add_executable(example_pingpong_client pingpong/client.cc)
+add_executable(example_pingpong_client pingpong/client.cc logger.cc)
 target_link_libraries(example_pingpong_client ${LIBRARIES})
 
-add_executable(example_pingpong_server pingpong/server.cc)
+add_executable(example_pingpong_server pingpong/server.cc logger.cc)
 target_link_libraries(example_pingpong_server ${LIBRARIES})
 
 add_executable(example_tcp_client tcp/tcp_client.cc)

@@ -3,6 +3,7 @@
 #include "evpp/inner_pre.h"
 #include "evpp/duration.h"
 #include "evpp/sys_addrinfo.h"
+#include "evpp/evlog.h"
 
 #include <vector>
 
@@ -18,6 +19,8 @@ public:
 
     DNSResolver(EventLoop* evloop, const std::string& host, Duration timeout, const Functor& f);
     ~DNSResolver();
+
+    void setLogger(logger* log_) { myLog = log_; }
     void Start();
     void Cancel();
     const std::string& host() const {
@@ -42,6 +45,8 @@ private:
     Functor functor_;
     std::unique_ptr<TimerEventWatcher> timer_;
     std::vector<struct in_addr> addrs_;
+
+    logger* myLog{nullptr};
 };
 
 }

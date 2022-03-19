@@ -3,7 +3,7 @@
 
 
 int OnMessage(const evnsq::Message* msg) {
-    LOG_INFO << "Received a message, id=" << msg->id << " message=[" << msg->body.ToString() << "]";
+    // LOG_INFO << "Received a message, id=" << msg->id << " message=[" << msg->body.ToString() << "]";
     return 0;
 }
 

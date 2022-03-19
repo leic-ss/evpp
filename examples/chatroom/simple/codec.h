@@ -16,7 +16,7 @@ public:
         while (buf->size() >= kHeaderLen) {
             const int32_t len = buf->PeekInt32();
             if (len > 65536 || len < 0) {
-                LOG_ERROR << "Invalid length " << len;
+//                LOG_ERROR << "Invalid length " << len;
                 conn->Close();
                 break;
             }

@@ -5,7 +5,7 @@
 
 void OnMessage(const evpp::TCPConnPtr& conn,
                evpp::Buffer* msg) {
-    LOG_INFO << "tid=" << std::this_thread::get_id() << " Received a message len=" << msg->size();
+    // LOG_INFO << "tid=" << std::this_thread::get_id() << " Received a message len=" << msg->size();
     if (msg->ToString() == "quit") {
         conn->Close();
         return;

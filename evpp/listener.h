@@ -2,6 +2,7 @@
 
 #include "evpp/inner_pre.h"
 #include "evpp/timestamp.h"
+#include "evpp/evlog.h"
 
 namespace evpp {
 class EventLoop;
@@ -17,6 +18,7 @@ public:
     Listener(EventLoop* loop, const std::string& addr/*local listening address : ip:port*/);
     ~Listener();
 
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     // socket listen
     void Listen(int backlog = SOMAXCONN);
 
@@ -38,6 +40,8 @@ private:
     std::string addr_;
     std::unique_ptr<FdChannel> chan_;
     NewConnectionCallback new_conn_fn_;
+
+    std::shared_ptr<logger> myLog{nullptr};
 };
 }
 

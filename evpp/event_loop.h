@@ -11,6 +11,7 @@
 #include "evpp/any.h"
 #include "evpp/invoke_timer.h"
 #include "evpp/server_status.h"
+#include "evpp/evlog.h"
 
 #ifdef H_HAVE_BOOST
 #include <boost/lockfree/queue.hpp>
@@ -44,6 +45,8 @@ public:
     // NOTE: Be careful to deal with the destructing work of event_base_ and watcher_ objects.
     explicit EventLoop(struct event_base* base);
     ~EventLoop();
+
+    void setLogger(logger* log_) { myLog = log_; }
 
     // @brief Run the IO Event driving loop forever
     // @note It must be called in the IO Event thread
@@ -132,5 +135,7 @@ private:
 #endif
 
     std::atomic<int> pending_functor_count_;
+
+    logger* myLog{nullptr};
 };
 }

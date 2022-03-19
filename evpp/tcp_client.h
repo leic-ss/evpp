@@ -4,6 +4,7 @@
 #include "evpp/event_loop.h"
 #include "evpp/tcp_callbacks.h"
 #include "evpp/any.h"
+#include "evpp/evlog.h"
 
 #include <map>
 #include <atomic>
@@ -32,6 +33,8 @@ public:
               const std::string& remote_addr/*host:port*/,
               const std::string& name);
     ~TCPClient();
+
+    void setLogger(logger* log_) { myLog = log_; }
 
     // @brief We can bind a local address. This is an optional operation.
     //  If necessary, it should be called before doing Connect().
@@ -106,7 +109,7 @@ private:
     void OnConnection(evpp_socket_t sockfd, const std::string& laddr);
     void OnRemoveConnection(const TCPConnPtr& conn);
     void Reconnect();
-private:
+protected:
     EventLoop* loop_;
     std::string local_addr_; // If the local address is not empty, we will bind to this local address before doing connect()
     std::string remote_addr_; // host:port
@@ -124,5 +127,7 @@ private:
 
     ConnectionCallback conn_fn_;
     MessageCallback msg_fn_;
+
+    logger* myLog{nullptr};
 };
 }

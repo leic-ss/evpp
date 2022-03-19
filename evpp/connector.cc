@@ -15,14 +15,13 @@ Connector::Connector(EventLoop* l, TCPClient* client)
     , owner_tcp_client_(client)
     , remote_addr_(client->remote_addr())
     , timeout_(client->connecting_timeout()) {
-    DLOG_TRACE << "raddr=" << remote_addr_;
+    _log_trace(myLog, "remote_addr_ = %s", remote_addr_.c_str());
     if (sock::SplitHostPort(remote_addr_.data(), remote_host_, remote_port_)) {
         raddr_ = sock::ParseFromIPPort(remote_addr_.data());
     }
 }
 
 Connector::~Connector() {
-    DLOG_TRACE;
     assert(loop_->IsInLoopThread());
     if (status_ == kDNSResolving) {
         assert(!chan_.get());
@@ -31,7 +30,7 @@ Connector::~Connector() {
     } else if (!IsConnected()) {
         // A connected tcp-connection's sockfd has been transfered to TCPConn.
         // But the sockfd of unconnected tcp-connections need to be closed by myself.
-        DLOG_TRACE << "close(" << chan_->fd() << ")";
+        _log_trace(myLog, "close %d", chan_->fd());
         assert(own_fd_);
         assert(chan_->fd() == fd_);
         EVUTIL_CLOSESOCKET(fd_);
@@ -43,7 +42,7 @@ Connector::~Connector() {
 }
 
 void Connector::Start() {
-    DLOG_TRACE << "Try to connect " << remote_addr_ << " status=" << StatusToString();
+    _log_info(myLog, "Try to connect %s status=%s", remote_addr_.c_str(), StatusToString().c_str());
     assert(loop_->IsInLoopThread());
 
     timer_.reset(new TimerEventWatcher(loop_, std::bind(&Connector::OnConnectTimeout, shared_from_this()), timeout_));
@@ -55,16 +54,17 @@ void Connector::Start() {
         return;
     }
 
-    DLOG_TRACE << "The remote address " << remote_addr_ << " is a host, try to resolve its IP address.";
+    _log_info(myLog, "The remote address %s is a host, try to resolve its IP address.", remote_addr_.c_str());
     status_ = kDNSResolving;
     auto f = std::bind(&Connector::OnDNSResolved, shared_from_this(), std::placeholders::_1);
     dns_resolver_ = std::make_shared<DNSResolver>(loop_, remote_host_, timeout_, f);
+    dns_resolver_->setLogger(myLog);
     dns_resolver_->Start();
 }
 
 
 void Connector::Cancel() {
-    DLOG_TRACE << "Cancel to connect " << remote_addr_ << " status=" << StatusToString();
+    _log_trace(myLog, "Cancel to connect %s status=%s", remote_addr_.c_str(), StatusToString().c_str());
     assert(loop_->IsInLoopThread());
     if (dns_resolver_) {
         dns_resolver_->Cancel();
@@ -90,7 +90,7 @@ void Connector::Cancel() {
 }
 
 void Connector::Connect() {
-    DLOG_TRACE << remote_addr_ << " status=" << StatusToString();
+    _log_trace(myLog, "Try to connect %s status=%s", remote_addr_.c_str(), StatusToString().c_str());
     assert(fd_ == INVALID_SOCKET);
     fd_ = sock::CreateNonblockingSocket();
     own_fd_ = true;
@@ -102,7 +102,7 @@ void Connector::Connect() {
         int rc = ::bind(fd_, addr, sizeof(*addr));
         if (rc != 0) {
             int serrno = errno;
-            LOG_ERROR << "bind failed, errno=" << serrno << " " << strerror(serrno);
+            _log_err(myLog, "bind failed, errno=%d err=%s", serrno, strerror(serrno));
             HandleError();
             return;
         }
@@ -122,18 +122,19 @@ void Connector::Connect() {
     status_ = kConnecting;
 
     chan_.reset(new FdChannel(loop_, fd_, false, true));
-    DLOG_TRACE << "new FdChannel p=" << chan_.get() << " fd=" << chan_->fd();
+    _log_trace(myLog, "new FdChannel fd=%d", chan_->fd());
     chan_->SetWriteCallback(std::bind(&Connector::HandleWrite, shared_from_this()));
     chan_->AttachToLoop();
 }
 
 void Connector::HandleWrite() {
-    DLOG_TRACE << remote_addr_ << " status=" << StatusToString();
+    _log_trace(myLog, "handle write %s status=%s", remote_addr_.c_str(), StatusToString().c_str());
     if (status_ == kDisconnected) {
         // The connecting may be timeout, but the write event handler has been
         // dispatched in the EventLoop pending task queue, and next loop time the handle is invoked.
         // So we need to check the status whether it is at a kDisconnected
-        LOG_INFO << "fd=" << chan_->fd() << " remote_addr=" << remote_addr_ << " receive write event when socket is closed";
+        _log_info(myLog, "fd=%d remote_addr=%s receive write event when socket is closed",
+                  chan_->fd(), remote_addr_.c_str());
         return;
     }
 
@@ -142,7 +143,7 @@ void Connector::HandleWrite() {
     socklen_t len = sizeof(len);
     if (getsockopt(chan_->fd(), SOL_SOCKET, SO_ERROR, (char*)&err, (socklen_t*)&len) != 0) {
         err = errno;
-        LOG_ERROR << "getsockopt failed err=" << err << " " << strerror(err);
+        _log_err(myLog, "getsockopt failed err=%d err=%s", err, strerror(err));
     }
 
     if (err != 0) {
@@ -165,7 +166,7 @@ void Connector::HandleWrite() {
 }
 
 void Connector::HandleError() {
-    DLOG_TRACE << remote_addr_ << " status=" << StatusToString();
+    _log_trace(myLog, "handle error %s status=%s", remote_addr_.c_str(), StatusToString().c_str());
     assert(loop_->IsInLoopThread());
     int serrno = errno;
 
@@ -174,7 +175,8 @@ void Connector::HandleError() {
     // TCPClient::Disconnect may cause this Connector object desctruct.
     auto self = shared_from_this();
 
-    LOG_ERROR << "this=" << this << " status=" << StatusToString() << " fd=" << fd_  << " use_count=" << self.use_count() << " errno=" << serrno << " " << strerror(serrno);
+    _log_trace(myLog, "status=%s fd=%d use_count=%d errno=%d err=%s",
+               StatusToString().c_str(), fd_, self.use_count(), serrno, strerror(serrno));
 
     status_ = kDisconnected;
 
@@ -210,28 +212,29 @@ void Connector::HandleError() {
 
         // We must close(fd) firstly and then we can do the reconnection.
         if (fd_ > 0) {
-            DLOG_TRACE << "Connector::HandleError close(" << fd_ << ")";
+            _log_trace(myLog, "Connector::HandleError close(%d)", fd_);
             assert(own_fd_);
             EVUTIL_CLOSESOCKET(fd_);
             fd_ = INVALID_SOCKET;
         }
 
-        DLOG_TRACE << "loop=" << loop_ << " auto reconnect in " << owner_tcp_client_->reconnect_interval().Seconds() << "s thread=" << std::this_thread::get_id();
+        _log_trace(myLog, "auto reconnect in %d s thread=%d",
+                   owner_tcp_client_->reconnect_interval().Seconds(), std::this_thread::get_id());
         loop_->RunAfter(owner_tcp_client_->reconnect_interval(), std::bind(&Connector::Start, shared_from_this()));
     }
 }
 
 void Connector::OnConnectTimeout() {
-    LOG_WARN << "this=" << this << " Connector::OnConnectTimeout status=" << StatusToString() << " fd=" << fd_ << " this=" << this;
+    _log_warn(myLog, "Connector::OnConnectTimeout status=%s fd=%d", StatusToString().c_str(), fd_);
     assert(status_ == kConnecting || status_ == kDNSResolving);
     EVUTIL_SET_SOCKET_ERROR(ETIMEDOUT);
     HandleError();
 }
 
 void Connector::OnDNSResolved(const std::vector <struct in_addr>& addrs) {
-    DLOG_TRACE << "addrs.size=" << addrs.size() << " this=" << this;
+    _log_trace(myLog, "addrs.size=%d", addrs.size());
     if (addrs.empty()) {
-        LOG_ERROR << "this=" << this << " DNS Resolve failed. host=" << dns_resolver_->host();
+        _log_err(myLog, "DNS Resolve failed. host=%s", dns_resolver_->host().c_str());
         HandleError();
         return;
     }

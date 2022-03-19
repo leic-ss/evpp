@@ -7,12 +7,10 @@ namespace evpp {
 
 InvokeTimer::InvokeTimer(EventLoop* evloop, Duration timeout, const Functor& f, bool periodic)
     : loop_(evloop), timeout_(timeout), functor_(f), periodic_(periodic) {
-    DLOG_TRACE << "loop=" << loop_;
 }
 
 InvokeTimer::InvokeTimer(EventLoop* evloop, Duration timeout, Functor&& f, bool periodic)
     : loop_(evloop), timeout_(timeout), functor_(std::move(f)), periodic_(periodic) {
-    DLOG_TRACE << "loop=" << loop_;
 }
 
 InvokeTimerPtr InvokeTimer::Create(EventLoop* evloop, Duration timeout, const Functor& f, bool periodic) {
@@ -28,11 +26,10 @@ InvokeTimerPtr InvokeTimer::Create(EventLoop* evloop, Duration timeout, Functor&
 }
 
 InvokeTimer::~InvokeTimer() {
-    DLOG_TRACE << "loop=" << loop_;
 }
 
 void InvokeTimer::Start() {
-    DLOG_TRACE << "loop=" << loop_ << " refcount=" << self_.use_count();
+    _log_trace(myLog, "refcount=%d", self_.use_count());
     auto f = [this]() {
         timer_.reset(new TimerEventWatcher(loop_, [time_weak = std::weak_ptr<InvokeTimer>(shared_from_this())]() {
             auto time_ptr = time_weak.lock();
@@ -49,13 +46,13 @@ void InvokeTimer::Start() {
         });
         timer_->Init();
         timer_->AsyncWait();
-        DLOG_TRACE << "timer=" << timer_.get() << " loop=" << loop_ << " refcount=" << self_.use_count() << " periodic=" << periodic_ << " timeout(ms)=" << timeout_.Milliseconds();
+        _log_trace(myLog, "refcount=%d periodic=%d timeout(ms)=%d", self_.use_count(), periodic_, timeout_.Milliseconds());
     };
     loop_->RunInLoop(std::move(f));
 }
 
 void InvokeTimer::Cancel() {
-    DLOG_TRACE;
+    // DLOG_TRACE;
     auto f = [time_weak = std::weak_ptr<InvokeTimer>(shared_from_this())]() {
         auto time_ptr = time_weak.lock();
         if (time_ptr && time_ptr->timer_) {
@@ -66,7 +63,7 @@ void InvokeTimer::Cancel() {
 }
 
 void InvokeTimer::OnTimerTriggered() {
-    DLOG_TRACE << "loop=" << loop_ << " use_count=" << self_.use_count();
+    _log_trace(myLog, "refcount=%d", self_.use_count());
     functor_();
 
     if (periodic_) {
@@ -78,7 +75,7 @@ void InvokeTimer::OnTimerTriggered() {
 }
 
 void InvokeTimer::OnCanceled() {
-    DLOG_TRACE << "loop=" << loop_ << " use_count=" << self_.use_count();
+    _log_trace(myLog, "refcount=%d", self_.use_count());
     periodic_ = false;
     if (cancel_callback_) {
         cancel_callback_();

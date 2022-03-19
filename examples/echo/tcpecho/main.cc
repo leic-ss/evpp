@@ -9,7 +9,7 @@
 void OnMessage(const evpp::TCPConnPtr& conn,
                evpp::Buffer* msg) {
     std::string s = msg->NextAllString();
-    LOG_INFO << "Received a message [" << s << "]";
+    // LOG_INFO << "Received a message [" << s << "]";
     conn->Send(s);
 
     if (s == "quit" || s == "exit") {
@@ -20,9 +20,9 @@ void OnMessage(const evpp::TCPConnPtr& conn,
 
 void OnConnection(const evpp::TCPConnPtr& conn) {
     if (conn->IsConnected()) {
-        LOG_INFO << "Accept a new connection from " << conn->remote_addr();
+        // LOG_INFO << "Accept a new connection from " << conn->remote_addr();
     } else {
-        LOG_INFO << "Disconnected from " << conn->remote_addr();
+        // LOG_INFO << "Disconnected from " << conn->remote_addr();
     }
 }
 

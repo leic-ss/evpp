@@ -15,7 +15,7 @@ void TestDNSResolver() {
         bool resolved = false;
         bool deleted = false;
         auto fn_resolved = [&resolved](const std::vector <struct in_addr>& addrs) {
-            LOG_INFO << "Entering fn_resolved";
+            // LOG_INFO << "Entering fn_resolved";
             resolved = true;
         };
 
@@ -30,7 +30,7 @@ void TestDNSResolver() {
         }
 
         auto fn_deleter = [&deleted, dns_resolver]() {
-            LOG_INFO << "Entering fn_deleter";
+            // LOG_INFO << "Entering fn_deleter";
             deleted = true;
         };
 

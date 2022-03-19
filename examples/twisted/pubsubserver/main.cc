@@ -29,7 +29,7 @@ private:
     void OnMessage(const evpp::TCPConnPtr& conn,
                    evpp::Buffer* msg) {
         std::string s = msg->NextAllString();
-        LOG_INFO << "Received a message [" << s << "]";
+        // LOG_INFO << "Received a message [" << s << "]";
         if (s == "quit" || s == "exit") {
             conn->Close();
         }
@@ -41,10 +41,10 @@ private:
 
     void OnConnection(const evpp::TCPConnPtr& conn) {
         if (conn->IsConnected()) {
-            LOG_INFO << "A new connection from " << conn->remote_addr() << " to " << server_->listen_addr() << " is UP";
+            // LOG_INFO << "A new connection from " << conn->remote_addr() << " to " << server_->listen_addr() << " is UP";
             conns_.insert(conn);
         } else {
-            LOG_INFO << "Disconnected from " << conn->remote_addr();
+            // LOG_INFO << "Disconnected from " << conn->remote_addr();
             conns_.erase(conn);
         }
     }

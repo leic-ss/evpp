@@ -47,6 +47,8 @@ endif (UNIX)
 
 string (REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
+include_directories(${PROJECT_SOURCE_DIR}/examples)
+
 option(CMAKE_USE_OLD_GDB "cmake to support old gdb" OFF)
 if(CMAKE_USE_OLD_GDB)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-3")

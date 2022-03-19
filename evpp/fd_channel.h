@@ -1,6 +1,7 @@
 #pragma once
 
 #include "event_watcher.h"
+#include "evlog.h"
 
 struct event;
 struct event_base;
@@ -29,6 +30,7 @@ public:
               bool watch_read_event, bool watch_write_event);
     ~FdChannel();
 
+    void setLogger(logger* log_) { myLog = log_; }
     void Close();
 
     // Attach this FdChannel to EventLoop
@@ -76,7 +78,8 @@ private:
 
     void Update();
     void DetachFromLoop();
-private:
+
+protected:
     ReadEventCallback read_fn_;
     EventCallback write_fn_;
 
@@ -87,6 +90,7 @@ private:
     int events_; // the bitwise OR of zero or more of the EventType flags
 
     evpp_socket_t fd_;
+    logger* myLog{nullptr};
 };
 
 }

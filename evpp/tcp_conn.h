@@ -8,6 +8,7 @@
 #include "evpp/slice.h"
 #include "evpp/any.h"
 #include "evpp/duration.h"
+#include "evpp/evlog.h"
 
 namespace evpp {
 
@@ -37,6 +38,7 @@ public:
             uint64_t id);
     ~TCPConn();
 
+    void setLogger(logger* log_) { myLog = log_; }
     void Close();
 
     void Send(const char* s) {
@@ -160,6 +162,9 @@ private:
     void SendInLoop(const Slice& message);
     void SendInLoop(const void* data, size_t len);
     void SendStringInLoop(const std::string& message);
+
+protected:
+    logger* myLog{nullptr};
 
 private:
     EventLoop* loop_;

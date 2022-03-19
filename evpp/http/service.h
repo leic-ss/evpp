@@ -1,6 +1,7 @@
 #pragma once
 
 #include "evpp/inner_pre.h"
+#include "evpp/evlog.h"
 #include "context.h"
 
 struct evhttp;
@@ -26,6 +27,7 @@ public:
 #endif
     ~Service();
 
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     bool Listen(int port);
     void Stop();
     void Pause();
@@ -86,6 +88,8 @@ private:
 	std::string certificate_chain_file_;
 	std::string private_key_file_;
 #endif
+
+	std::shared_ptr<logger> myLog{nullptr};
 };
 }
 

@@ -84,6 +84,6 @@ int main(int argc, char* argv[]) {
     PostTask p(thread_count, post_count);
     p.Start();
     p.Wait();
-    LOG_WARN << argv[0] << " thread_count=" << thread_count << " post_count=" << post_count << " use time: " << p.use_time() << " seconds\n";
+    // LOG_WARN << argv[0] << " thread_count=" << thread_count << " post_count=" << post_count << " use time: " << p.use_time() << " seconds\n";
     return 0;
 }

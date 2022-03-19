@@ -36,7 +36,7 @@ public:
 
 private:
     void OnConnection(const evpp::TCPConnPtr& conn) {
-        LOG_INFO << conn->AddrToString() << " is " << (conn->IsConnected() ? "UP" : "DOWN");
+        // LOG_INFO << conn->AddrToString() << " is " << (conn->IsConnected() ? "UP" : "DOWN");
 
         std::lock_guard<std::mutex> lock(mutex_);
         if (conn->IsConnected()) {

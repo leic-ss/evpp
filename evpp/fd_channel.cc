@@ -12,7 +12,7 @@ static_assert(FdChannel::kWritable == EV_WRITE, "");
 
 FdChannel::FdChannel(EventLoop* l, evpp_socket_t f, bool r, bool w)
     : loop_(l), attached_(false), event_(nullptr), fd_(f) {
-    DLOG_TRACE << "fd=" << fd_;
+    _log_trace(myLog, "fd=%d", fd_);
     assert(fd_ > 0);
     events_ = (r ? kReadable : 0) | (w ? kWritable : 0);
     event_ = new event;
@@ -20,12 +20,12 @@ FdChannel::FdChannel(EventLoop* l, evpp_socket_t f, bool r, bool w)
 }
 
 FdChannel::~FdChannel() {
-    DLOG_TRACE << "fd=" << fd_;
+    _log_trace(myLog, "fd=%d", fd_);
     assert(event_ == nullptr);
 }
 
 void FdChannel::Close() {
-    DLOG_TRACE << "fd=" << fd_;
+    _log_trace(myLog, "fd=%d", fd_);
     assert(event_);
     if (event_) {
         assert(!attached_);
@@ -56,10 +56,10 @@ void FdChannel::AttachToLoop() {
     ::event_base_set(loop_->event_base(), event_);
 
     if (EventAdd(event_, nullptr) == 0) {
-        DLOG_TRACE << "fd=" << fd_ << " watching event " << EventsToString();
+        _log_trace(myLog, "fd=%d watching event=%s", fd_, EventsToString().c_str());
         attached_ = true;
     } else {
-        LOG_ERROR << "this=" << this << " fd=" << fd_ << " with event " << EventsToString() << " attach to event loop failed";
+        _log_err(myLog, "fd=%d with event %s attach to event loop failed", fd_, EventsToString().c_str());
     }
 }
 
@@ -113,9 +113,9 @@ void FdChannel::DetachFromLoop() {
 
     if (EventDel(event_) == 0) {
         attached_ = false;
-        DLOG_TRACE << "fd=" << fd_ << " detach from event loop";
+        _log_trace(myLog, "fd=%d detach from event loop", fd_);
     } else {
-        LOG_ERROR << "DetachFromLoop this=" << this << "fd=" << fd_ << " with event " << EventsToString() << " detach from event loop failed";
+        _log_err(myLog, "DetachFromLoop fd=%d with event %s detach from event loop failed", fd_, EventsToString().c_str());
     }
 }
 
@@ -154,7 +154,7 @@ void FdChannel::HandleEvent(evpp_socket_t sockfd, short which, void* v) {
 
 void FdChannel::HandleEvent(evpp_socket_t sockfd, short which) {
     assert(sockfd == fd_);
-    DLOG_TRACE << "fd=" << sockfd << " " << EventsToString();
+    _log_trace(myLog, "fd=%d err=%s", sockfd, EventsToString().c_str());
 
     if ((which & kReadable) && read_fn_) {
         read_fn_();

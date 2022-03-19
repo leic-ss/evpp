@@ -65,7 +65,7 @@ namespace evpp {
 
 #if defined(EVPP_HTTP_SERVER_SUPPORTS_SSL)
         bool Service::initSSL(bool force_enable) {
-            DLOG_TRACE << "https service init ssl";
+            // DLOG_TRACE << "https service init ssl";
             if(force_enable) {
                 if(ssl_ctx_) { SSL_CTX_free(ssl_ctx_); }
                 ssl_ctx_ = nullptr;
@@ -81,7 +81,7 @@ namespace evpp {
             /* 创建SSL上下文 */
             SSL_CTX *ctx = SSL_CTX_new (SSLv23_server_method ());
             if(ctx == NULL) {
-                LOG_ERROR << "SSL_CTX_new failed";
+                _log_err(myLog, "SSL_CTX_new failed");
                 return false;
             }
             /* 设置SSL选项 https://linux.die.net/man/3/ssl_ctx_set_options */
@@ -95,35 +95,33 @@ namespace evpp {
             /* 创建椭圆曲线加密key */
             EC_KEY *ecdh = EC_KEY_new_by_curve_name (NID_X9_62_prime256v1);
             if (ecdh == NULL) {
-                LOG_ERROR << "EC_KEY_new_by_curve_name failed";
+                _log_err(myLog, "EC_KEY_new_by_curve_name failed");
                 ERR_print_errors_fp(stderr);
                 return false;
             }
             /* 设置ECDH临时公钥 */
             if (1 != SSL_CTX_set_tmp_ecdh (ctx, ecdh)) {
-                LOG_ERROR << "SSL_CTX_set_tmp_ecdh failed";
+                _log_err(myLog, "SSL_CTX_set_tmp_ecdh failed");
                 return false;
             }
             /* 加载证书链文件(文件编码必须为PEM格式，使用Base64编码) */
             /* 此处也可使用SSL_CTX_use_certificate_file仅加载公钥证书 */
             if (1 != SSL_CTX_use_certificate_chain_file (
                             ctx, certificate_chain_file_.c_str())) {
-                LOG_ERROR << "Load certificate chain file(" 
-                    << certificate_chain_file_.c_str() << ")failed";
+                _log_err(myLog, "Load certificate chain file(%s) failed",  certificate_chain_file_.c_str());
                 ERR_print_errors_fp(stderr);
                 return false;
             }
             /* 加载私钥文件 */
             if (1 != SSL_CTX_use_PrivateKey_file (
                             ctx, private_key_file_.c_str(), SSL_FILETYPE_PEM)) {
-                LOG_ERROR << "Load private key file(" 
-                    << private_key_file_.c_str() << ")failed";
+                _log_err(myLog, "Load private key file(%s) failed", private_key_file_.c_str());
                 ERR_print_errors_fp(stderr);
                 return false;
             }
             /* 校验私钥与证书是否匹配 */
             if (1 != SSL_CTX_check_private_key (ctx)) {
-                LOG_ERROR << "EC_KEY_new_by_curve_name failed";
+                _log_err(myLog, "EC_KEY_new_by_curve_name failed");
                 ERR_print_errors_fp(stderr);
                 return false;
             }
@@ -171,7 +169,7 @@ namespace evpp {
         }
 
         void Service::Stop() {
-            DLOG_TRACE << "http service is stopping";
+            // DLOG_TRACE << "http service is stopping";
             assert(listen_loop_->IsInLoopThread());
 
             if (evhttp_) {
@@ -182,32 +180,32 @@ namespace evpp {
 
             callbacks_.clear();
             default_callback_ = HTTPRequestCallback();
-            DLOG_TRACE << "http service stopped";
+            // DLOG_TRACE << "http service stopped";
         }
 
 
         void Service::Pause() {
             assert(listen_loop_->IsInLoopThread());
-            DLOG_TRACE << "http service pause";
+            // DLOG_TRACE << "http service pause";
 #if LIBEVENT_VERSION_NUMBER >= 0x02001500
             if (evhttp_bound_socket_) {
                 evconnlistener_disable(evhttp_bound_socket_get_listener(evhttp_bound_socket_));
             }
 #else
-            LOG_ERROR << "Not support!".;
+            _log_err(myLog, "Not support!");
             assert(false && "Not support");
 #endif
         }
 
         void Service::Continue() {
             assert(listen_loop_->IsInLoopThread());
-            DLOG_TRACE << "http service continue";
+            // DLOG_TRACE << "http service continue";
 #if LIBEVENT_VERSION_NUMBER >= 0x02001500
             if (evhttp_bound_socket_) {
                 evconnlistener_enable(evhttp_bound_socket_get_listener(evhttp_bound_socket_));
             }
 #else
-            LOG_ERROR << "Not support!".;
+            _log_err(myLog, "Not support!");
             assert(false && "Not support");
 #endif
         }
@@ -229,7 +227,7 @@ namespace evpp {
             // In the main HTTP listening thread,
             // this is the main entrance of the HTTP request processing.
             assert(listen_loop_->IsInLoopThread());
-            DLOG_TRACE << "handle request " << req << " url=" << req->uri;
+            // DLOG_TRACE << "handle request " << req << " url=" << req->uri;
 
             ContextPtr ctx(new Context(req));
             ctx->Init();
@@ -251,7 +249,7 @@ namespace evpp {
         }
 
         void Service::DefaultHandleRequest(const ContextPtr& ctx) {
-            DLOG_TRACE << "url=" << ctx->original_uri();
+            // DLOG_TRACE << "url=" << ctx->original_uri();
             if (default_callback_) {
                 auto f = std::bind(&Service::SendReply, this, ctx, std::placeholders::_1);
                 default_callback_(listen_loop_, ctx, f);
@@ -286,7 +284,7 @@ namespace evpp {
 
         void Service::SendReply(const ContextPtr& ctx, const std::string& response_data) {
             // In the worker thread
-            DLOG_TRACE << "send reply in working thread";
+            // DLOG_TRACE << "send reply in working thread";
 
             // Build the response package in the worker thread
             std::shared_ptr<Response> response(new Response(ctx, response_data));
@@ -294,13 +292,13 @@ namespace evpp {
             auto f = [this, response]() {
                 // In the main HTTP listening thread
                 assert(listen_loop_->IsInLoopThread());
-                DLOG_TRACE << "send reply in listening thread. evhttp_=" << evhttp_;
+                // DLOG_TRACE << "send reply in listening thread. evhttp_=" << evhttp_;
 
                 auto x = response->ctx.get();
 
                 // At this moment, this Service maybe already stopped.
                 if (!evhttp_) {
-                    LOG_WARN << "this=" << this << " Service has been stopped.";
+                    _log_err(myLog, " Service has been stopped.");
                     return;
                 }
 
@@ -319,10 +317,10 @@ namespace evpp {
 
             // Forward this response sending task to HTTP listening thread
             if (listen_loop_->IsRunning()) {
-                DLOG_TRACE << "dispatch this SendReply to listening thread";
+                // DLOG_TRACE << "dispatch this SendReply to listening thread";
                 listen_loop_->RunInLoop(f);
             } else {
-                LOG_WARN << "this=" << this << " listening thread is going to stop. we discards this request.";
+                _log_warn(myLog, "listening thread is going to stop. we discards this request.");
                 // TODO do we need do some resource recycling about the evhttp_request?
             }
         }

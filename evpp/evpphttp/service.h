@@ -4,6 +4,7 @@
 #include "evpp/tcp_server.h"
 #include "evpp/evpphttp/http_request.h"
 #include "evpp/evpphttp/http_response.h"
+#include "evpp/evlog.h"
 namespace evpp {
 namespace evpphttp {
 typedef std::function<void(const int response_code, const std::map<std::string, std::string>& response_field_value, const std::string& response_data)> HTTPSendResponseCallback;
@@ -14,6 +15,8 @@ private:
 public:
     Service(const std::string& listen_addr, const std::string& name, uint32_t thread_num);
     ~Service();
+
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     void Stop();
     bool Init(const ConnectionCallback& cb = [](const TCPConnPtr& conn) {
         conn->SetTCPNoDelay(true);
@@ -43,6 +46,8 @@ private:
     HTTPRequestCallback default_callback_;
     HTTPRequestCallbackMap callbacks_;
     bool is_stopped_{false};
+
+    std::shared_ptr<logger> myLog{nullptr};
 };
 }
 }

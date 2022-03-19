@@ -38,7 +38,7 @@ static void RequestHandler201(evpp::EventLoop* loop, const evpp::http::ContextPt
 }
 
 static void RequestHandler909(evpp::EventLoop* loop, const evpp::http::ContextPtr& ctx, const evpp::http::HTTPSendResponseCallback& cb) {
-    LOG_INFO << "RequestHandler909";
+    // LOG_INFO << "RequestHandler909";
     std::stringstream oss;
     oss << "func=" << __FUNCTION__ << " OK"
         << " ip=" << ctx->remote_ip() << "\n"
@@ -269,7 +269,7 @@ static void Test909() {
 
 int main() {
     int i = 2;
-    LOG_INFO << "Running testHTTPServer i=" << i;
+    // LOG_INFO << "Running testHTTPServer i=" << i;
     evpp::http::Server ph(i);
     ph.RegisterDefaultHandler(&DefaultRequestHandler);
     ph.RegisterHandler("/909", &RequestHandler909);
@@ -277,15 +277,15 @@ int main() {
     auto pid = fork();
     if (pid != 0) {
         // In parent process 
-        LOG_INFO << "In parent process. Starting";
+        // LOG_INFO << "In parent process. Starting";
         ph.Start();
-        LOG_INFO << "In parent process. Stopping";
+        // LOG_INFO << "In parent process. Stopping";
         ph.Stop();
-        LOG_INFO << "In parent process. Stopped";
+        // LOG_INFO << "In parent process. Stopped";
         return 0;
     }
     
-    LOG_INFO << "In child process. Doing AfterFork";
+    // LOG_INFO << "In child process. Doing AfterFork";
     ph.AfterFork();
     ph.Start();
     H_TEST_ASSERT(r);

@@ -72,7 +72,7 @@ void Request::Execute(const Handler& h) {
 }
 
 void Request::ExecuteInLoop() {
-    DLOG_TRACE;
+    // DLOG_TRACE;
     assert(loop_->IsInLoopThread());
     evhttp_cmd_type req_type = EVHTTP_REQ_GET;
 
@@ -135,7 +135,7 @@ void Request::ExecuteInLoop() {
 failed:
     // Retry
     if (retried_ < retry_number_) {
-        LOG_WARN << "this=" << this << " http request failed : " << errmsg << " retried=" << retried_ << " max retry_time=" << retry_number_ << ". Try again.";
+        // LOG_WARN << "this=" << this << " http request failed : " << errmsg << " retried=" << retried_ << " max retry_time=" << retry_number_ << ". Try again.";
         Retry();
         return;
     }
@@ -178,7 +178,7 @@ void Request::HandleResponse(struct evhttp_request* r) {
         int response_code = r->response_code;
         bool needs_retry = response_code >= 500 && response_code < 600;
         if (!needs_retry || retried_ >= retry_number_) {
-            LOG_WARN << "this=" << this << " response_code=" << r->response_code << " retried=" << retried_ << " max retry_time=" << retry_number_;
+            // LOG_WARN << "this=" << this << " response_code=" << r->response_code << " retried=" << retried_ << " max retry_time=" << retry_number_;
             std::shared_ptr<Response> response(new Response(this, r));
 
             //Recycling the http Connection object
@@ -194,7 +194,7 @@ void Request::HandleResponse(struct evhttp_request* r) {
 
     // Retry
     if (retried_ < retry_number_) {
-        LOG_WARN << "this=" << this << " response_code=" << (r ? r->response_code : 0) << " retried=" << retried_ << " max retry_time=" << retry_number_ << ". Try again";
+        // LOG_WARN << "this=" << this << " response_code=" << (r ? r->response_code : 0) << " retried=" << retried_ << " max retry_time=" << retry_number_ << ". Try again";
         Retry();
         return;
     }
@@ -207,12 +207,12 @@ void Request::HandleResponse(struct evhttp_request* r) {
         char buffer[256];
         while ((oslerr = bufferevent_get_openssl_error(conn_->bufferevent()))) {
             ERR_error_string_n(oslerr, buffer, sizeof(buffer));
-            LOG_ERROR << "Openssl error: " << buffer;
+            // LOG_ERROR << "Openssl error: " << buffer;
             printed_some_error = true;
         }
         if (!printed_some_error) {
-            LOG_ERROR << "socket error(" << errcode << "): "
-                << evutil_socket_error_to_string(errcode);
+            // LOG_ERROR << "socket error(" << errcode << "): "
+            //     << evutil_socket_error_to_string(errcode);
         }
     }
 #endif

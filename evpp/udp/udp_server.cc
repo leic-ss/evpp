@@ -29,7 +29,7 @@ public:
             try {
                 thread_->join();
             } catch (const std::system_error& e) {
-                LOG_ERROR << "Caught a system_error:" << e.what();
+                // LOG_ERROR << "Caught a system_error:" << e.what();
             }
         }
     }
@@ -38,7 +38,7 @@ public:
         this->port_ = p;
         this->fd_ = sock::CreateUDPServer(p);
         if (this->fd_ < 0) {
-            LOG_ERROR << "listen error";
+            // LOG_ERROR << "listen error";
             return false;
         }
         sock::SetTimeout(this->fd_, 500);
@@ -131,7 +131,7 @@ bool Server::Init(const std::string& listen_ports/*like "53,5353,1053"*/) {
     for (auto& s : vec) {
         int i = std::atoi(s.c_str());
         if (i <= 0) {
-            LOG_ERROR << "Cannot convert [" << s << "] to a integer. 'listen_ports' format wrong.";
+            // LOG_ERROR << "Cannot convert [" << s << "] to a integer. 'listen_ports' format wrong.";
             return false;
         }
         v.push_back(i);
@@ -146,7 +146,7 @@ void Server::AfterFork() {
 
 bool Server::Start() {
     if (!message_handler_) {
-        LOG_ERROR << "MessageHandler DO NOT set!";
+        // LOG_ERROR << "MessageHandler DO NOT set!";
         return false;
     }
 
@@ -205,7 +205,7 @@ bool Server::IsStopped() const {
 }
 
 void Server::RecvingLoop(RecvThread* thread) {
-    LOG_INFO << "UDPServer is running at 0.0.0.0:" << thread->port();
+//    LOG_INFO << "UDPServer is running at 0.0.0.0:" << thread->port();
     thread->SetStatus(kRunning);
     while (true) {
         if (thread->IsPaused()) {
@@ -223,8 +223,8 @@ void Server::RecvingLoop(RecvThread* thread) {
         socklen_t addr_len = sizeof(struct sockaddr);
         int readn = ::recvfrom(thread->fd(), (char*)recv_msg->WriteBegin(), recv_buf_size_, 0, recv_msg->mutable_remote_addr(), &addr_len);
         if (readn >= 0) {
-            LOG_TRACE << "fd=" << thread->fd() << " port=" << thread->port()
-                      << " recv len=" << readn << " from " << sock::ToIPPort(recv_msg->remote_addr());
+            // LOG_TRACE << "fd=" << thread->fd() << " port=" << thread->port()
+            //           << " recv len=" << readn << " from " << sock::ToIPPort(recv_msg->remote_addr());
 
             recv_msg->WriteBytes(readn);
             if (tpool_) {
@@ -244,11 +244,11 @@ void Server::RecvingLoop(RecvThread* thread) {
                 continue;
             }
 
-            LOG_ERROR << "errno=" << eno << " " << strerror(eno);
+            // LOG_ERROR << "errno=" << eno << " " << strerror(eno);
         }
     }
 
-    LOG_INFO << "fd=" << thread->fd() << " port=" << thread->port() << " UDP server existed.";
+//    LOG_INFO << "fd=" << thread->fd() << " port=" << thread->port() << " UDP server existed.";
     thread->SetStatus(kStopped);
 }
 

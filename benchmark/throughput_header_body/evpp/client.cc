@@ -129,13 +129,13 @@ public:
 
     void OnConnect() {
         if (++connected_count_ == session_count_) {
-            LOG_WARN << "all connected";
+            // LOG_WARN << "all connected";
         }
     }
 
     void OnDisconnect(const evpp::TCPConnPtr& conn) {
         if (--connected_count_ == 0) {
-            LOG_WARN << "all disconnected";
+            // LOG_WARN << "all disconnected";
 
             uint32_t finished_count = 0;
             uint32_t error_count = 0;
@@ -149,8 +149,8 @@ public:
                 }
             }
 
-            LOG_WARN << "name=" << name_ << " error count " << error_count;
-            LOG_WARN << "name=" << name_ << " average time(s) " << total_time.Seconds()/finished_count;
+            // LOG_WARN << "name=" << name_ << " error count " << error_count;
+            // LOG_WARN << "name=" << name_ << " average time(s) " << total_time.Seconds()/finished_count;
             loop_->QueueInLoop(std::bind(&Client::Quit, this));
         }
     }
@@ -167,7 +167,7 @@ private:
     }
 
     void HandleTimeout() {
-        LOG_WARN << "stop";
+        // LOG_WARN << "stop";
         for (auto &it : sessions_) {
             it->Stop();
         }

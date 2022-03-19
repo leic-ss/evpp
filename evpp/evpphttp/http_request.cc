@@ -20,7 +20,8 @@ int HttpRequest::Parse(evpp::Buffer * buf) {
     size_t parsed = http_parser_execute(&parser, &settings, buf->data(), buf->size());
     auto err = HTTP_PARSER_ERRNO(&parser);
     if (err != HPE_OK && err != HPE_PAUSED) {
-        LOG_WARN << "http request header parsed failed, err=" << http_errno_name(err) << "," << http_errno_description(err);
+        _log_warn(myLog, "http request header parsed failed, errname=%s errdesc=%s",
+                  http_errno_name(err), http_errno_description(err));
         return err;
     }
     buf->Retrieve(parsed);

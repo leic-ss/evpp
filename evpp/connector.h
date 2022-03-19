@@ -16,6 +16,8 @@ public:
     typedef std::function<void(evpp_socket_t sockfd, const std::string& /*local addr*/)> NewConnectionCallback;
     Connector(EventLoop* loop, TCPClient* client);
     ~Connector();
+
+    void setLogger(logger* log_) { myLog = log_; }
     void Start();
     void Cancel();
 public:
@@ -64,5 +66,7 @@ private:
     std::unique_ptr<TimerEventWatcher> timer_;
     std::shared_ptr<DNSResolver> dns_resolver_;
     NewConnectionCallback conn_fn_;
+
+    logger* myLog{nullptr};
 };
 }
