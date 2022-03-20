@@ -124,6 +124,7 @@ void Connector::Connect() {
     chan_.reset(new FdChannel(loop_, fd_, false, true));
     _log_trace(myLog, "new FdChannel fd=%d", chan_->fd());
     chan_->SetWriteCallback(std::bind(&Connector::HandleWrite, shared_from_this()));
+    chan_->setLogger(myLog);
     chan_->AttachToLoop();
 }
 

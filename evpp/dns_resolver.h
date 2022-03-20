@@ -20,7 +20,7 @@ public:
     DNSResolver(EventLoop* evloop, const std::string& host, Duration timeout, const Functor& f);
     ~DNSResolver();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     void Start();
     void Cancel();
     const std::string& host() const {
@@ -46,7 +46,7 @@ private:
     std::unique_ptr<TimerEventWatcher> timer_;
     std::vector<struct in_addr> addrs_;
 
-    logger* myLog{nullptr};
+    std::shared_ptr<logger> myLog{nullptr};
 };
 
 }

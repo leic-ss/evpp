@@ -38,7 +38,7 @@ public:
             uint64_t id);
     ~TCPConn();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     void Close();
 
     void Send(const char* s) {
@@ -164,7 +164,7 @@ private:
     void SendStringInLoop(const std::string& message);
 
 protected:
-    logger* myLog{nullptr};
+    std::shared_ptr<logger> myLog{nullptr};
 
 private:
     EventLoop* loop_;

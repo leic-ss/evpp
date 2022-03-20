@@ -75,7 +75,7 @@ public:
         connected_count_(0) {
         loop->RunAfter(evpp::Duration(double(timeout_sec)), std::bind(&Client::HandleTimeout, this));
         auto evtp = new evpp::EventLoopThreadPool(loop, threadCount);
-        evtp->setLogger(log_);
+        // evtp->setLogger(log_);
         tpool_.reset(evtp);
         tpool_->Start(true);
 
@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
     log->setLogLevel("TRAC");
 
     evpp::EventLoop loop;
-    loop.setLogger(log);
+    // loop.setLogger(log);
     std::string serverAddr = std::string(ip) + ":" + std::to_string(port);
 
     Client client(&loop, serverAddr, blockSize, sessionCount, timeout, threadCount, log);

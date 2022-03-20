@@ -14,7 +14,7 @@ public:
     EventLoopThreadPool(EventLoop* base_loop, uint32_t thread_num);
     ~EventLoopThreadPool();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     bool Start(bool wait_thread_started = false);
 
     void Stop(bool wait_thread_exited = false);
@@ -49,6 +49,6 @@ protected:
     typedef std::shared_ptr<EventLoopThread> EventLoopThreadPtr;
     std::vector<EventLoopThreadPtr> threads_;
 
-    logger* myLog{nullptr};
+    std::shared_ptr<logger> myLog{nullptr};
 };
 }

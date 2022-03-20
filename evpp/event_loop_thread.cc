@@ -14,6 +14,12 @@ EventLoopThread::~EventLoopThread() {
     Join();
 }
 
+void EventLoopThread::setLogger(std::shared_ptr<logger> log_)
+{
+    myLog = log_;
+    event_loop_->setLogger(log_);
+}
+
 bool EventLoopThread::Start(bool wait_thread_started, Functor pre, Functor post) {
     // DLOG_TRACE;
     status_ = kStarting;

@@ -32,12 +32,12 @@ int main(int argc, char* argv[]) {
     evpp::logger* log = evpp::CCLogger::instance();
     log->setLogLevel("TRAC");
     evpp::EventLoop loop;
-    loop.setLogger(log);
+    // loop.setLogger(log);
 
     evpp::TCPServer server(&loop, addr, "TCPPingPongServer", thread_num);
     server.SetMessageCallback(&OnMessage);
     server.SetConnectionCallback(&OnConnection);
-    server.setLogger(log);
+    // server.setLogger(log);
     server.Init();
     server.Start();
     loop.Run();

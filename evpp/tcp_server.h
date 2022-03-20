@@ -62,7 +62,7 @@ public:
               uint32_t thread_num);
     ~TCPServer();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
 
     // @brief Do the initialization works here.
     //  It will create a nonblocking TCP socket, and bind with the give address
@@ -103,7 +103,7 @@ public:
     }
 
 protected:
-    logger* myLog{nullptr};
+    std::shared_ptr<logger> myLog{nullptr};
 
 private:
     void StopThreadPool();

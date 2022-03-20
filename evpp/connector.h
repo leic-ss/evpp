@@ -17,7 +17,7 @@ public:
     Connector(EventLoop* loop, TCPClient* client);
     ~Connector();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
     void Start();
     void Cancel();
 public:
@@ -67,6 +67,6 @@ private:
     std::shared_ptr<DNSResolver> dns_resolver_;
     NewConnectionCallback conn_fn_;
 
-    logger* myLog{nullptr};
+    std::shared_ptr<logger> myLog{nullptr};
 };
 }

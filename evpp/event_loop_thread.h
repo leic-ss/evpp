@@ -24,7 +24,7 @@ public:
     EventLoopThread();
     ~EventLoopThread();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void setLogger(std::shared_ptr<logger> log_);
 
     // @param wait_thread_started - If it is true this method will block
     //  until the thread totally started
@@ -62,6 +62,6 @@ private:
 
     std::string name_;
 
-    logger* myLog{nullptr};
+    std::shared_ptr<logger> myLog{nullptr};
 };
 }

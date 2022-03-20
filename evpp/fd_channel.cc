@@ -21,11 +21,13 @@ FdChannel::FdChannel(EventLoop* l, evpp_socket_t f, bool r, bool w)
 
 FdChannel::~FdChannel() {
     _log_trace(myLog, "fd=%d", fd_);
+    // fprintf(stderr, "destruction fd=%d\n", fd_);
     assert(event_ == nullptr);
 }
 
 void FdChannel::Close() {
     _log_trace(myLog, "fd=%d", fd_);
+    // fprintf(stderr, "close fd=%d\n", fd_);
     assert(event_);
     if (event_) {
         assert(!attached_);
@@ -153,8 +155,10 @@ void FdChannel::HandleEvent(evpp_socket_t sockfd, short which, void* v) {
 }
 
 void FdChannel::HandleEvent(evpp_socket_t sockfd, short which) {
+    // fprintf(stderr, "sockfd=%d fd=%d %d err=%s\n", sockfd, fd_, this, EventsToString().c_str());
+    _log_trace(myLog, "sockfd=%d fd=%d err=%s", sockfd, fd_, EventsToString().c_str());
     assert(sockfd == fd_);
-    _log_trace(myLog, "fd=%d err=%s", sockfd, EventsToString().c_str());
+    // _log_trace(myLog, "fd=%d err=%s", sockfd, EventsToString().c_str());
 
     if ((which & kReadable) && read_fn_) {
         read_fn_();
