@@ -11,7 +11,7 @@ public:
     inline bool completed() const {
         return is_completed;
     }
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     HttpRequest();
     HttpRequest(HttpRequest & hr) {
         swap(hr);
@@ -149,7 +149,7 @@ private:
     http_parser_settings settings;
     http_parser_url  u;
 
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 }
 }

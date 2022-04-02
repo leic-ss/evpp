@@ -16,7 +16,7 @@ public:
 
     virtual ~EventWatcher();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     bool Init();
 
     // @note It MUST be called in the event thread.
@@ -50,7 +50,7 @@ protected:
     Handler handler_;
     Handler cancel_callback_;
 
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 
 class EVPP_EXPORT PipeEventWatcher : public EventWatcher {

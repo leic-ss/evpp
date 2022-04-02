@@ -27,7 +27,7 @@ public:
 #endif
     ~Service();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     bool Listen(int port);
     void Stop();
     void Pause();
@@ -89,7 +89,7 @@ private:
 	std::string private_key_file_;
 #endif
 
-	std::shared_ptr<logger> myLog{nullptr};
+	logger* myLog{nullptr};
 };
 }
 

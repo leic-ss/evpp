@@ -18,7 +18,7 @@ public:
     Listener(EventLoop* loop, const std::string& addr/*local listening address : ip:port*/);
     ~Listener();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     // socket listen
     void Listen(int backlog = SOMAXCONN);
 
@@ -41,7 +41,7 @@ private:
     std::unique_ptr<FdChannel> chan_;
     NewConnectionCallback new_conn_fn_;
 
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 }
 

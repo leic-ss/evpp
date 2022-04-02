@@ -16,7 +16,7 @@ public:
     Service(const std::string& listen_addr, const std::string& name, uint32_t thread_num);
     ~Service();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     void Stop();
     bool Init(const ConnectionCallback& cb = [](const TCPConnPtr& conn) {
         conn->SetTCPNoDelay(true);
@@ -47,7 +47,7 @@ private:
     HTTPRequestCallbackMap callbacks_;
     bool is_stopped_{false};
 
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 }
 }

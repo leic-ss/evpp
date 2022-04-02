@@ -34,7 +34,7 @@ public:
                                  bool periodic);
     ~InvokeTimer();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     // It is thread safe.
     // Start this timer.
     void Start();
@@ -60,7 +60,7 @@ private:
     bool periodic_;
     std::shared_ptr<InvokeTimer> self_; // Hold myself
 
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 
 }

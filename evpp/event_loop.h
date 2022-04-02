@@ -46,7 +46,7 @@ public:
     explicit EventLoop(struct event_base* base);
     ~EventLoop();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
 
     // @brief Run the IO Event driving loop forever
     // @note It must be called in the IO Event thread
@@ -136,6 +136,6 @@ private:
 
     std::atomic<int> pending_functor_count_;
 
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 }

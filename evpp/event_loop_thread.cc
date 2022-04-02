@@ -14,7 +14,7 @@ EventLoopThread::~EventLoopThread() {
     Join();
 }
 
-void EventLoopThread::setLogger(std::shared_ptr<logger> log_)
+void EventLoopThread::setLogger(logger* log_)
 {
     myLog = log_;
     event_loop_->setLogger(log_);

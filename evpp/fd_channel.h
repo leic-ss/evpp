@@ -30,7 +30,7 @@ public:
               bool watch_read_event, bool watch_write_event);
     ~FdChannel();
 
-    void setLogger(std::shared_ptr<logger> log_) { myLog = log_; }
+    void setLogger(logger* log_) { myLog = log_; }
     void Close();
 
     // Attach this FdChannel to EventLoop
@@ -90,7 +90,7 @@ protected:
     int events_; // the bitwise OR of zero or more of the EventType flags
 
     evpp_socket_t fd_;
-    std::shared_ptr<logger> myLog{nullptr};
+    logger* myLog{nullptr};
 };
 
 }

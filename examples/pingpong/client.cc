@@ -25,6 +25,8 @@ public:
             std::bind(&Session::OnMessage, this, std::placeholders::_1, std::placeholders::_2));
     }
 
+    void setLogger(evpp::logger* log_) { myLog = log_; }
+
     void Start() {
         client_.Connect();
     }
@@ -46,6 +48,7 @@ private:
 
     void OnMessage(const evpp::TCPConnPtr& conn, evpp::Buffer* buf) {
         // LOG_TRACE << "bytes_read=" << bytes_read_ << " bytes_writen=" << bytes_written_;
+        _log_trace(myLog, "bytes_read_=%d bytes_writen=%d", bytes_read_, bytes_written_);
         ++messages_read_;
         bytes_read_ += buf->size();
         bytes_written_ += buf->size();
@@ -58,6 +61,8 @@ private:
     int64_t bytes_read_;
     int64_t bytes_written_;
     int64_t messages_read_;
+
+    evpp::logger* myLog{nullptr};
 };
 
 class Client {
@@ -75,7 +80,7 @@ public:
         connected_count_(0) {
         loop->RunAfter(evpp::Duration(double(timeout_sec)), std::bind(&Client::HandleTimeout, this));
         auto evtp = new evpp::EventLoopThreadPool(loop, threadCount);
-        // evtp->setLogger(log_);
+        evtp->setLogger(log_);
         tpool_.reset(evtp);
         tpool_->Start(true);
 
@@ -88,6 +93,7 @@ public:
             snprintf(buf, sizeof buf, "C%05d", i);
             Session* session = new Session(tpool_->GetNextLoop(), serverAddr, buf, this);
             session->Start();
+            session->setLogger(log_);
             sessions_.push_back(session);
         }
     }
@@ -182,7 +188,7 @@ int main(int argc, char* argv[]) {
     log->setLogLevel("TRAC");
 
     evpp::EventLoop loop;
-    // loop.setLogger(log);
+    loop.setLogger(log);
     std::string serverAddr = std::string(ip) + ":" + std::to_string(port);
 
     Client client(&loop, serverAddr, blockSize, sessionCount, timeout, threadCount, log);
