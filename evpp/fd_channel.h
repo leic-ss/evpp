@@ -30,7 +30,7 @@ public:
               bool watch_read_event, bool watch_write_event);
     ~FdChannel();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     void Close();
 
     // Attach this FdChannel to EventLoop

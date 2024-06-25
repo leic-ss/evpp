@@ -46,7 +46,7 @@ public:
     explicit EventLoop(struct event_base* base);
     ~EventLoop();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
 
     // @brief Run the IO Event driving loop forever
     // @note It must be called in the IO Event thread

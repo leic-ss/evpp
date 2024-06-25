@@ -7,6 +7,7 @@ file(GLOB evpp_HTTP_PUBLIC_HEADERS http/*.h)
 file(GLOB evpp_EVPPHTTP_PUBLIC_HEADERS evpphttp/*.h)
 file(GLOB evpp_HTTPC_PUBLIC_HEADERS httpc/*.h)
 file(GLOB evpp_UDP_PUBLIC_HEADERS udp/*.h)
+# file(GLOB evpp_RPC_HEADERS rpc/*.h)
 
 message(STATUS "evpp_SRCS : " ${evpp_SRCS})
 
@@ -33,8 +34,8 @@ if (UNIX)
     # boost lockfree queue
     add_library(evpp_boost SHARED ${evpp_SRCS})
     add_library(evpp_boost_static STATIC ${evpp_SRCS})
-    target_compile_definitions(evpp_boost PRIVATE -DH_HAVE_BOOST=1)
-    target_compile_definitions(evpp_boost_static PRIVATE -DH_HAVE_BOOST=1)
+    target_compile_definitions(evpp_boost PRIVATE)
+    target_compile_definitions(evpp_boost_static PRIVATE)
     target_link_libraries(evpp_boost        ${DEPENDENT_LIBRARIES})
     target_link_libraries(evpp_boost_static ${DEPENDENT_LIBRARIES})
 
@@ -77,3 +78,4 @@ install (FILES ${evpp_HTTP_PUBLIC_HEADERS} DESTINATION "include/evpp/http")
 install (FILES ${evpp_EVPPHTTP_PUBLIC_HEADERS} DESTINATION "include/evpp/evpphttp")
 install (FILES ${evpp_HTTPC_PUBLIC_HEADERS} DESTINATION "include/evpp/httpc")
 install (FILES ${evpp_UDP_PUBLIC_HEADERS} DESTINATION "include/evpp/udp")
+# install (FILES ${evpp_RPC_HEADERS} DESTINATION "include/evpp/rpc")

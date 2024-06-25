@@ -38,7 +38,7 @@ public:
             uint64_t id);
     ~TCPConn();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     void Close();
 
     void Send(const char* s) {

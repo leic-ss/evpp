@@ -16,7 +16,7 @@ public:
 
     virtual ~EventWatcher();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     bool Init();
 
     // @note It MUST be called in the event thread.

@@ -36,10 +36,8 @@ You may obtain a copy of the License at
 #include <sys/time.h>
 #include <string.h>
 
-namespace evpp {
-
-#ifndef _BASE_EV_LOGGER_
-#define _BASE_EV_LOGGER_
+#ifndef __BASE_LOGGER__
+#define __BASE_LOGGER__
 
 #define EVLOG_FILE_NAME(x) strrchr( (x),'/')?strrchr( (x) ,'/')+1:(x)
 
@@ -49,7 +47,6 @@ namespace evpp {
 #define EVLOG_LEVEL_DEBUG 3
 #define EVLOG_LEVEL_TRACE 4
 
-// printf style log macro
 #define _log_(level, l, ...)        \
     if (l && l->getLogLevel() >= level) \
         (l)->logMessage(level, EVLOG_FILE_NAME(__FILE__), __LINE__, __FUNCTION__, __VA_ARGS__)
@@ -61,6 +58,8 @@ namespace evpp {
 #define _log_trace(l, ...)  _log_(EVLOG_LEVEL_TRACE,   l, __VA_ARGS__)
 
 #endif
+
+namespace evpp {
 
 class logger {
 public:

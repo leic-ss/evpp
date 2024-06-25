@@ -24,7 +24,7 @@ public:
     EventLoopThread();
     ~EventLoopThread();
 
-    void setLogger(logger* log_);
+    void SetLogger(logger* log_);
 
     // @param wait_thread_started - If it is true this method will block
     //  until the thread totally started

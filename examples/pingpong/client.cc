@@ -4,7 +4,7 @@
 #include <evpp/event_loop_thread_pool.h>
 #include <evpp/buffer.h>
 #include <evpp/tcp_conn.h>
-#include "logger.h"
+#include "evpp/logger.h"
 
 class Client;
 
@@ -25,7 +25,7 @@ public:
             std::bind(&Session::OnMessage, this, std::placeholders::_1, std::placeholders::_2));
     }
 
-    void setLogger(evpp::logger* log_) { myLog = log_; }
+    void SetLogger(evpp::logger* log_) { myLog = log_; }
 
     void Start() {
         client_.Connect();
@@ -80,7 +80,7 @@ public:
         connected_count_(0) {
         loop->RunAfter(evpp::Duration(double(timeout_sec)), std::bind(&Client::HandleTimeout, this));
         auto evtp = new evpp::EventLoopThreadPool(loop, threadCount);
-        evtp->setLogger(log_);
+        evtp->SetLogger(log_);
         tpool_.reset(evtp);
         tpool_->Start(true);
 
@@ -92,8 +92,8 @@ public:
             char buf[32];
             snprintf(buf, sizeof buf, "C%05d", i);
             Session* session = new Session(tpool_->GetNextLoop(), serverAddr, buf, this);
+            session->SetLogger(log_);
             session->Start();
-            session->setLogger(log_);
             sessions_.push_back(session);
         }
     }
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
     log->setLogLevel("TRAC");
 
     evpp::EventLoop loop;
-    loop.setLogger(log);
+    loop.SetLogger(log);
     std::string serverAddr = std::string(ip) + ":" + std::to_string(port);
 
     Client client(&loop, serverAddr, blockSize, sessionCount, timeout, threadCount, log);

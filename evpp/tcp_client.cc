@@ -51,7 +51,7 @@ void TCPClient::Connect() {
         assert(loop_->IsInLoopThread());
         connector_.reset(new Connector(loop_, this));
         connector_->SetNewConnectionCallback(std::bind(&TCPClient::OnConnection, this, std::placeholders::_1, std::placeholders::_2));
-        connector_->setLogger(myLog);
+        connector_->SetLogger(myLog);
         connector_->Start();
     };
     loop_->RunInLoop(f);

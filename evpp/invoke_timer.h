@@ -34,7 +34,7 @@ public:
                                  bool periodic);
     ~InvokeTimer();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     // It is thread safe.
     // Start this timer.
     void Start();

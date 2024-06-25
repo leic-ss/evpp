@@ -62,7 +62,7 @@ public:
               uint32_t thread_num);
     ~TCPServer();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
 
     // @brief Do the initialization works here.
     //  It will create a nonblocking TCP socket, and bind with the give address

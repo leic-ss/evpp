@@ -17,7 +17,7 @@ public:
     Connector(EventLoop* loop, TCPClient* client);
     ~Connector();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     void Start();
     void Cancel();
 public:

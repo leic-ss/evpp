@@ -57,6 +57,14 @@ elseif(NOT CMAKE_USE_OLD_GDB)
     message(STATUS "CMAKE_USE_OLD_GDB : Disabled")
 endif()
 
+if(CMAKE_USE_BOOST)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-3")
+    message(STATUS "CMAKE_USE_BOOST : Enabled")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DH_HAVE_BOOST=1")
+elseif(NOT CMAKE_USE_BOOST)
+    message(STATUS "CMAKE_USE_BOOST : Disabled")
+endif()
+
 if (UNIX)
     SET(CMAKE_CXX_FLAGS_DEBUG   "-O0 -g -ggdb -D_DEBUG -DGOOGLE_STRIP_LOG=0")
     SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -g -ggdb -DNDEBUG -DGOOGLE_STRIP_LOG=1")
@@ -74,8 +82,17 @@ if (HTTPS)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEVPP_HTTP_SERVER_SUPPORTS_SSL")
 endif (HTTPS)
 
+if (DEPS_PREFIX_PATH)
+    message(STATUS "DEPS_PREFIX_PATH: " ${DEPS_PREFIX_PATH})
+else()
+    set(DEPS_PREFIX_PATH ${PROJECT_SOURCE_DIR}/deps_prefix)
+    message(STATUS "DEPS_PREFIX_PATH is not given, Default: " ${DEPS_PREFIX_PATH})
+endif()
+
+include_directories(${DEPS_PREFIX_PATH}/include)
+
 list(APPEND DEPENDENT_LIBRARIES pthread event)
-link_directories(/apps/mdsenv/deps/lib)
+link_directories(${DEPS_PREFIX_PATH}/lib)
 
 if (CMAKE_BENCHMARK_TESTING)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DH_BENCHMARK_TESTING=1")
@@ -102,7 +119,6 @@ message (STATUS "THRIFT_INCLUDE_DIR " ${THRIFT_INCLUDE_DIR})
 message (STATUS "THRIFT_LIBRARY " ${THRIFT_LIBRARY})
 
 add_subdirectory (evpp)
-add_subdirectory (rpc)
 add_subdirectory (apps)
 #add_subdirectory (labs)
 

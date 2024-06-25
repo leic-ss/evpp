@@ -58,7 +58,7 @@ void Connector::Start() {
     status_ = kDNSResolving;
     auto f = std::bind(&Connector::OnDNSResolved, shared_from_this(), std::placeholders::_1);
     dns_resolver_ = std::make_shared<DNSResolver>(loop_, remote_host_, timeout_, f);
-    dns_resolver_->setLogger(myLog);
+    dns_resolver_->SetLogger(myLog);
     dns_resolver_->Start();
 }
 
@@ -124,7 +124,7 @@ void Connector::Connect() {
     chan_.reset(new FdChannel(loop_, fd_, false, true));
     _log_trace(myLog, "new FdChannel fd=%d", chan_->fd());
     chan_->SetWriteCallback(std::bind(&Connector::HandleWrite, shared_from_this()));
-    chan_->setLogger(myLog);
+    chan_->SetLogger(myLog);
     chan_->AttachToLoop();
 }
 
@@ -177,7 +177,7 @@ void Connector::HandleError() {
     auto self = shared_from_this();
 
     _log_trace(myLog, "status=%s fd=%d use_count=%d errno=%d err=%s",
-               StatusToString().c_str(), fd_, self.use_count(), serrno, strerror(serrno));
+               StatusToString().c_str(), fd_, self.use_count(), serrno, strerror(serrno).c_str());
 
     status_ = kDisconnected;
 
@@ -219,7 +219,7 @@ void Connector::HandleError() {
             fd_ = INVALID_SOCKET;
         }
 
-        _log_trace(myLog, "auto reconnect in %d s thread=%d",
+        _log_trace(myLog, "auto reconnect in %f s thread=%d",
                    owner_tcp_client_->reconnect_interval().Seconds(), std::this_thread::get_id());
         loop_->RunAfter(owner_tcp_client_->reconnect_interval(), std::bind(&Connector::Start, shared_from_this()));
     }

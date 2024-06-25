@@ -14,10 +14,10 @@ EventLoopThread::~EventLoopThread() {
     Join();
 }
 
-void EventLoopThread::setLogger(logger* log_)
+void EventLoopThread::SetLogger(logger* log_)
 {
     myLog = log_;
-    event_loop_->setLogger(log_);
+    event_loop_->SetLogger(log_);
 }
 
 bool EventLoopThread::Start(bool wait_thread_started, Functor pre, Functor post) {

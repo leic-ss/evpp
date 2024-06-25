@@ -18,7 +18,7 @@ public:
     Listener(EventLoop* loop, const std::string& addr/*local listening address : ip:port*/);
     ~Listener();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     // socket listen
     void Listen(int backlog = SOMAXCONN);
 

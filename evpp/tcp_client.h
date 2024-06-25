@@ -34,7 +34,7 @@ public:
               const std::string& name);
     ~TCPClient();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
 
     // @brief We can bind a local address. This is an optional operation.
     //  If necessary, it should be called before doing Connect().

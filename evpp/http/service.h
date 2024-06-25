@@ -27,7 +27,7 @@ public:
 #endif
     ~Service();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     bool Listen(int port);
     void Stop();
     void Pause();

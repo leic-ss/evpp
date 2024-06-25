@@ -62,7 +62,7 @@ public:
 			const char* private_key_file = "");
 #endif
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     bool Init(int listen_port);
     bool Init(const std::vector<int>& listen_ports);
     bool Init(const std::string& listen_ports/*like "80,8080,443"*/);

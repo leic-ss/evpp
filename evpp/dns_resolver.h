@@ -20,7 +20,7 @@ public:
     DNSResolver(EventLoop* evloop, const std::string& host, Duration timeout, const Functor& f);
     ~DNSResolver();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     void Start();
     void Cancel();
     const std::string& host() const {

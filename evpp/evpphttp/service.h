@@ -16,7 +16,7 @@ public:
     Service(const std::string& listen_addr, const std::string& name, uint32_t thread_num);
     ~Service();
 
-    void setLogger(logger* log_) { myLog = log_; }
+    void SetLogger(logger* log_) { myLog = log_; }
     void Stop();
     bool Init(const ConnectionCallback& cb = [](const TCPConnPtr& conn) {
         conn->SetTCPNoDelay(true);

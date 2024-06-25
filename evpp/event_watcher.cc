@@ -152,15 +152,15 @@ void PipeEventWatcher::DoClose() {
 void PipeEventWatcher::HandlerFn(evpp_socket_t fd, short /*which*/, void* v) {
     // _log_info(myLog, "PipeEventWatcher::HandlerFn fd=%d", fd);
     PipeEventWatcher* e = (PipeEventWatcher*)v;
-#ifdef H_BENCHMARK_TESTING
+// #ifdef H_BENCHMARK_TESTING
     // Every time we only read 1 byte for testing the IO event performance.
     // We use it in the benchmark test program 
     //  1. evpp/benchmark/ioevent/evpp/
     //  1. evpp/benchmark/ioevent/fd_channel_vs_pipe_event_watcher/
-    char buf[1];
-#else
-    char buf[128];
-#endif
+//    char buf[1];
+// #else
+    char buf[4096];
+// #endif
     int n = 0;
 
     if ((n = ::recv(e->pipe_[1], buf, sizeof(buf), 0)) > 0) {
