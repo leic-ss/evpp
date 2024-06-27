@@ -10,6 +10,10 @@
 #include <algorithm>
 
 namespace evpp {
+
+class Buffer;
+using BufferPtr = std::shared_ptr<Buffer>;
+
 class EVPP_EXPORT Buffer {
 public:
     static const size_t kCheapPrependSize;
@@ -73,6 +77,8 @@ public:
     void Reset() {
         Truncate(0);
     }
+
+    uint64_t ReservedPrependSize() { return reserved_prepend_size_; }
 
     // Increase the capacity of the container to a value that's greater
     // or equal to len. If len is greater than the current capacity(),
@@ -194,6 +200,13 @@ public:
 
     //Read
 public:
+    void SetReadIndex(uint64_t index) {
+        if (index > write_index_) return ;
+        read_index_ = index;
+    }
+    void ResetData() { read_index_ = reserved_prepend_size_; }
+    void ResetBegin() { read_index_ = 0; }
+
     // Peek int64_t/int32_t/int16_t/int8_t with network endian
     int64_t ReadInt64() {
         int64_t result = PeekInt64();
@@ -343,6 +356,11 @@ public:
         return write_index_ - read_index_;
     }
 
+    uint64_t total() {
+        assert(write_index_ >= read_index_);
+        return write_index_;
+    }
+
     // size returns the number of bytes of the unread portion of the buffer.
     // It is the same as length().
     size_t size() const {
@@ -389,7 +407,6 @@ public:
         const void* eol = memchr(start, '\n', WriteBegin() - start);
         return static_cast<const char*>(eol);
     }
-private:
 
     char* begin() {
         return buffer_;
@@ -399,6 +416,7 @@ private:
         return buffer_;
     }
 
+private:
     void grow(size_t len) {
         if (WritableBytes() + PrependableBytes() < len + reserved_prepend_size_) {
             //grow the capacity

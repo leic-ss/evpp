@@ -48,6 +48,8 @@ public:
     void Send(const std::string& d);
     void Send(const Slice& message);
     void Send(Buffer* buf);
+    void Send(BufferPtr buf);
+    void SendTotal(BufferPtr buf);
 public:
     EventLoop* loop() const {
         return loop_;
@@ -162,6 +164,8 @@ private:
     void SendInLoop(const Slice& message);
     void SendInLoop(const void* data, size_t len);
     void SendStringInLoop(const std::string& message);
+    void SendBufferInLoop(BufferPtr buf);
+    void SendTotalBufferInLoop(BufferPtr buf);
 
 protected:
     logger* myLog{nullptr};

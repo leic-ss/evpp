@@ -106,12 +106,45 @@ void TCPConn::Send(Buffer* buf) {
     }
 }
 
+void TCPConn::Send(BufferPtr buf) {
+    if (status_ != kConnected) {
+        return;
+    }
+
+    if (loop_->IsInLoopThread()) {
+        SendInLoop(buf->data(), buf->length());
+    } else {
+        loop_->RunInLoop(std::bind(&TCPConn::SendBufferInLoop, shared_from_this(), buf));
+    }
+}
+
+void TCPConn::SendTotal(BufferPtr buf)
+{
+    if (status_ != kConnected) {
+        return;
+    }
+
+    if (loop_->IsInLoopThread()) {
+        SendInLoop(buf->begin(), buf->total());
+    } else {
+        loop_->RunInLoop(std::bind(&TCPConn::SendTotalBufferInLoop, shared_from_this(), buf));
+    }
+}
+
 void TCPConn::SendInLoop(const Slice& message) {
     SendInLoop(message.data(), message.size());
 }
 
 void TCPConn::SendStringInLoop(const std::string& message) {
     SendInLoop(message.data(), message.size());
+}
+
+void TCPConn::SendBufferInLoop(BufferPtr buf) {
+    SendInLoop(buf->data(), buf->length());
+}
+
+void TCPConn::SendTotalBufferInLoop(BufferPtr buf) {
+    SendInLoop(buf->begin(), buf->total());
 }
 
 void TCPConn::SendInLoop(const void* data, size_t len) {
@@ -244,7 +277,7 @@ void TCPConn::DelayClose() {
 }
 
 void TCPConn::HandleClose() {
-    _log_trace(myLog, "addr=%s fd=%d status_=%s", AddrToString().c_str(), fd_, StatusToString().c_str());
+    _log_warn(myLog, "addr=%s fd=%d status_=%s", AddrToString().c_str(), fd_, StatusToString().c_str());
 
     // Avoid multi calling
     if (status_ == kDisconnected) {
@@ -279,13 +312,13 @@ void TCPConn::HandleClose() {
     if (close_fn_) {
         close_fn_(conn);
     }
-    _log_trace(myLog, "addr=%s fd=%d status_=%s use_count=%d",
+    _log_warn(myLog, "addr=%s fd=%d status_=%s use_count=%d",
                AddrToString().c_str(), fd_, StatusToString().c_str(), conn.use_count());
     status_ = kDisconnected;
 }
 
 void TCPConn::HandleError() {
-    _log_trace(myLog, "fd=%d status=%s", fd_, StatusToString().c_str());
+    _log_warn(myLog, "fd=%d status=%s", fd_, StatusToString().c_str());
     status_ = kDisconnecting;
     HandleClose();
 }
