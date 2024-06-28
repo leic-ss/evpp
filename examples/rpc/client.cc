@@ -66,37 +66,113 @@ void ConnectionRPC::Stop()
 
 void ConnectionRPC::Write(const std::string& message)
 {
-    evpp::TCPConnPtr conn;
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        conn = connection_;
+    auto self = shared_from_this();
+
+    auto func = [self, message] () {
+        auto conn = self->client_.conn();
+        conn->Send(message);
+    };
+
+    client_.loop()->RunInLoop(func);
+    return ;
+}
+
+void ConnectionRPC::OnMessage(const evpp::TCPConnPtr& conn, evpp::Buffer* buf)
+{
+    while (true) {
+        uint32_t total = buf->length();
+        if (total < sizeof(uint32_t)) {
+            return ;
+        }
+        uint32_t expect_len = buf->PeekInt32();
+        if (total < expect_len) {
+            return ;
+        }
+        buf->Skip(sizeof(uint32_t));
+        uint32_t seqno = buf->ReadInt32();
+
+        evpp::Slice msg = buf->Next(expect_len - 2*sizeof(uint32_t));
+
+        // _log_info(myLog, "recv: %d %d seq: %d %.*s", total, expect_len, seqno, msg.size(), msg.data());
+
+        auto iter = ctxs.find(seqno);
+        if (iter != ctxs.end()) {
+            ContextXPtr ctx = iter->second;
+            ctx->rspbuf = std::make_shared<evpp::Buffer>();
+            ctx->rspbuf->Append(msg);
+
+            ctx->timer->Cancel();
+            ctxs.erase(iter);
+
+            if(ctx->cb) ctx->cb(ctx);
+        } else {
+            // warn already timeout
+        }
     }
 
-    if (conn) {
-        conn->Send(message);
-    }
+    return ;
+}
+
+void ConnectionRPC::Request(const evpp::Slice message, ContextX::Callback cb, double timeout_ms)
+{
+    auto self = shared_from_this();
+
+    uint32_t seqno = sequence.fetch_add(1);
+
+    auto reqbuf = std::make_shared<evpp::Buffer>();
+    reqbuf->Append(message);
+    uint32_t total_len = reqbuf->total();
+
+    reqbuf->PrependInt32(seqno);
+    reqbuf->PrependInt32(total_len);
+    reqbuf->ResetData();
+
+    ContextXPtr ctx = std::make_shared<ContextX>();
+    ctx->reqbuf = reqbuf;
+    ctx->seqno = seqno;
+    ctx->cb = cb;
+
+    auto timeout_handler = [self, this, seqno] () {
+
+        auto iter = ctxs.find(seqno);
+        if (iter != ctxs.end()) {
+            ContextXPtr ctx = iter->second;
+            ctx->status = ContextX::Status::TIMEOUT;
+
+            ctxs.erase(iter);
+
+            if (ctx->cb) ctx->cb(ctx);
+
+            _log_info(myLog, "timeout_handler! seqno: %d", seqno);
+        } else {
+            // error
+        }
+    };
+
+    auto func = [self, this, ctx] () {
+
+        ctxs.emplace(ctx->seqno, ctx);
+
+        auto conn = client_.conn();
+        if (conn) {
+            conn->Send(ctx->reqbuf->begin(), ctx->reqbuf->total());
+        } else {
+            _log_info(myLog, "conn is null");
+        }
+    };
+
+    client_.loop()->RunInLoop(func);
+
+    ctx->timer = client_.loop()->RunAfter(timeout_ms, timeout_handler);
 
     return ;
 }
 
 void ConnectionRPC::OnConnection(const evpp::TCPConnPtr& conn)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-
-    if (conn->IsConnected()) {
-        connection_ = conn;
-    } else {
-        connection_.reset();
-    }
-
     _log_info(myLog, "invoke %lu status: %d",
               (uint64_t)client_.connecting_timeout().Microseconds(), conn->status());
     awaiter.invoke();
-}
-
-void ConnectionRPC::OnMessage(const evpp::TCPConnPtr& conn, evpp::Buffer* buf)
-{
-    _log_info(myLog, "recv: %s", buf->ToString().c_str());
 }
 
 bool ClientRPC::Initial() 

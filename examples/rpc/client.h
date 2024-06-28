@@ -19,9 +19,11 @@ namespace rpc
 
 class ConnectionRPC;
 class ClientRPC;
+class ContextX;
 
 using ConnectionRPCPtr = std::shared_ptr<ConnectionRPC>;
 using ClientRPCPtr = std::shared_ptr<ClientRPC>;
+using ContextXPtr = std::shared_ptr<ContextX>;
 
 class AWaiter {
 private:
@@ -51,6 +53,33 @@ private:
     std::condition_variable cv;
 };
 
+class ContextX : public std::enable_shared_from_this<ContextX>
+{
+public:
+    using Callback = std::function<void(ContextXPtr)>;
+
+public:
+    ContextX() : status(Status::OK) {}
+    virtual ~ContextX(void) {}
+
+public:
+    enum class Status : uint8_t {
+        OK = 0,
+        TIMEOUT,
+        FAILED,
+        CLOSED
+    };
+
+public:
+    uint32_t                seqno{0};
+    evpp::BufferPtr         reqbuf{nullptr};
+    evpp::BufferPtr         rspbuf{nullptr};
+
+    Callback                cb{nullptr};
+    Status                  status{Status::OK};
+    evpp::InvokeTimerPtr    timer;
+};
+
 class ConnectionRPC : public std::enable_shared_from_this<ConnectionRPC>
 {
 public:
@@ -77,6 +106,8 @@ public:
 
     void Write(const std::string& message);
 
+    void Request(const evpp::Slice message, ContextX::Callback, double timeout_ms);
+
 protected:
     void OnConnection(const evpp::TCPConnPtr& conn);
 
@@ -85,8 +116,8 @@ protected:
 private:
     evpp::TCPClient client_;
 
-    std::mutex mutex_;
-    evpp::TCPConnPtr connection_{nullptr};
+    std::atomic<uint32_t> sequence{0};
+    std::unordered_map<uint32_t, ContextXPtr> ctxs;
 
     evpp::logger* myLog{nullptr};
     AWaiter awaiter;

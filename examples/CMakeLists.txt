@@ -35,8 +35,11 @@ target_link_libraries(example_tcp_client ${LIBRARIES})
 add_executable(example_tcp_server tcp/tcp_server.cc)
 target_link_libraries(example_tcp_server ${LIBRARIES})
 
-add_executable(example_rpc_client rpc/client.cc rpc/example.cc)
-target_link_libraries(example_rpc_client ${LIBRARIES})
+add_executable(rpc_client rpc/client.cc rpc/rpc_client.cc)
+target_link_libraries(rpc_client ${LIBRARIES})
+
+add_executable(rpc_server rpc/rpc_server.cc)
+target_link_libraries(rpc_server ${LIBRARIES})
 
 add_executable(example_multi_accept multi_accept/main.cc)
 target_link_libraries(example_multi_accept ${LIBRARIES})
