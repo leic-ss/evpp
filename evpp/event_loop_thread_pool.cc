@@ -41,15 +41,21 @@ bool EventLoopThreadPool::Start(bool wait_thread_started) {
         };
 
         EventLoopThreadPtr t(new EventLoopThread());
+
+        std::stringstream ss;
+        if (name_.empty()) {
+            ss << "evpool-" << i;
+        } else {
+            ss << name_ << "-" << i;
+        }
+        t->set_name(ss.str());
+
         if (!t->Start(wait_thread_started, prefn, postfn)) {
             //FIXME error process
             _log_err(myLog, "start thread failed!");
             return false;
         }
 
-        std::stringstream ss;
-        ss << "EventLoopThreadPool-thread-" << i << "th";
-        t->set_name(ss.str());
         threads_.push_back(t);
     }
 

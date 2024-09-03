@@ -3,6 +3,8 @@
 #include "evpp/event_loop.h"
 #include "evpp/event_loop_thread.h"
 
+#include <sys/prctl.h>
+
 namespace evpp {
 
 EventLoopThread::EventLoopThread()
@@ -35,6 +37,14 @@ bool EventLoopThread::Start(bool wait_thread_started, Functor pre, Functor post)
     return true;
 }
 
+static bool set_thread_name(char *name)
+{
+    if (prctl(PR_SET_NAME, (unsigned long)name, 0, 0, 0) < 0) {
+        return false;
+    }
+    return true;
+}
+
 void EventLoopThread::Run(const Functor& pre, const Functor& post) {
     if (name_.empty()) {
         std::ostringstream os;
@@ -42,6 +52,9 @@ void EventLoopThread::Run(const Functor& pre, const Functor& post) {
         name_ = os.str();
     }
 
+    if ( !set_thread_name((char*)name_.c_str()) ) {
+        _log_err(myLog, "set thread name failed! name[%s]", name_.c_str());
+    }
 
     _log_trace(myLog, "execute pre functor.");
     auto fn = [this, pre]() {

@@ -33,6 +33,10 @@ public:
 
     uint32_t thread_num() const;
 
+public:
+    void set_name(const std::string& n) { name_ = n; }
+    const std::string& name() const { return name_; }
+
 private:
     void Stop(bool wait_thread_exit, DoneCallback fn);
     void OnThreadStarted(uint32_t count);
@@ -48,6 +52,8 @@ protected:
 
     typedef std::shared_ptr<EventLoopThread> EventLoopThreadPtr;
     std::vector<EventLoopThreadPtr> threads_;
+
+    std::string name_;
 
     logger* myLog{nullptr};
 };
