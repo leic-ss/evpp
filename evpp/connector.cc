@@ -102,7 +102,7 @@ void Connector::Connect() {
         int rc = ::bind(fd_, addr, sizeof(*addr));
         if (rc != 0) {
             int serrno = errno;
-            _log_err(myLog, "bind failed, errno=%d err=%s", serrno, strerror(serrno));
+            _log_err(myLog, "bind failed, errno=%d err=%s", serrno, strerror(serrno).c_str());
             HandleError();
             return;
         }
@@ -144,7 +144,7 @@ void Connector::HandleWrite() {
     socklen_t len = sizeof(len);
     if (getsockopt(chan_->fd(), SOL_SOCKET, SO_ERROR, (char*)&err, (socklen_t*)&len) != 0) {
         err = errno;
-        _log_err(myLog, "getsockopt failed err=%d err=%s", err, strerror(err));
+        _log_err(myLog, "getsockopt failed err=%d err=%s", err, strerror(err).c_str());
     }
 
     if (err != 0) {

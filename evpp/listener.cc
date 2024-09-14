@@ -21,7 +21,7 @@ void Listener::Listen(int backlog) {
     fd_ = sock::CreateNonblockingSocket();
     if (fd_ < 0) {
         int serrno = errno;
-        _log_err(myLog, "Create a nonblocking socket failed, err: %s", strerror(serrno));
+        _log_err(myLog, "Create a nonblocking socket failed, err: %s", strerror(serrno).c_str());
         return;
     }
 
@@ -30,13 +30,13 @@ void Listener::Listen(int backlog) {
     int ret = ::bind(fd_, sock::sockaddr_cast(&addr), static_cast<socklen_t>(sizeof(struct sockaddr)));
     if (ret < 0) {
         int serrno = errno;
-        _log_err(myLog, "bind error: %s addr: %s", strerror(serrno), addr_.c_str());
+        _log_err(myLog, "bind error: %s addr: %s", strerror(serrno).c_str(), addr_.c_str());
     }
 
     ret = ::listen(fd_, backlog);
     if (ret < 0) {
         int serrno = errno;
-        _log_err(myLog, "Listen failed, err: %s", strerror(serrno));
+        _log_err(myLog, "Listen failed, err: %s", strerror(serrno).c_str());
     }
 }
 
@@ -57,7 +57,7 @@ void Listener::HandleAccept() {
     if ((nfd = ::accept(fd_, sock::sockaddr_cast(&ss), &addrlen)) == -1) {
         int serrno = errno;
         if (serrno != EAGAIN && serrno != EINTR) {
-            _log_warn(myLog, "bad accept %s", strerror(serrno));
+            _log_warn(myLog, "bad accept %s", strerror(serrno).c_str());
         }
         return;
     }

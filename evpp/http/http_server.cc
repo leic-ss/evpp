@@ -76,7 +76,8 @@ bool Server::Init(int listen_port) {
 #endif
     if (!lt.hservice->Listen(listen_port)) {
         int serrno = errno;
-        _log_err(myLog, "http server listen at port %d failed. errno=%d err=%s", listen_port, serrno, strerror(serrno));
+        _log_err(myLog, "http server listen at port %d failed. errno=%d err=%s",
+                 listen_port, serrno, strerror(serrno).c_str());
         lt.hservice->Stop();
         return false;
     }

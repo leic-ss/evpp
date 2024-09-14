@@ -124,7 +124,7 @@ bool PipeEventWatcher::DoInit() {
 
     if (evutil_socketpair(AF_UNIX, SOCK_STREAM, 0, pipe_) < 0) {
         int err = errno;
-        _log_err(myLog, "create socketpair ERROR errno=%d err=%s", err, strerror(err));
+        _log_err(myLog, "create socketpair ERROR errno=%d err=%s", err, strerror(err).c_str());
         goto failed;
     }
 

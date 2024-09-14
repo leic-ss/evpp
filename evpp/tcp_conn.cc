@@ -171,7 +171,7 @@ void TCPConn::SendInLoop(const void* data, size_t len) {
             int serrno = errno;
             nwritten = 0;
             if (!EVUTIL_ERR_RW_RETRIABLE(serrno)) {
-                _log_err(myLog, "SendInLoop write failed errno=%d err=%s", serrno, strerror(serrno));
+                _log_err(myLog, "SendInLoop write failed errno=%d err=%s", serrno, strerror(serrno).c_str());
                 if (serrno == EPIPE || serrno == ECONNRESET) {
                     write_error = true;
                 }
@@ -234,9 +234,9 @@ void TCPConn::HandleRead() {
         }
     } else {
         if (EVUTIL_ERR_RW_RETRIABLE(serrno)) {
-            _log_trace(myLog, "errno=%d err=%s", serrno, strerror(serrno));
+            _log_trace(myLog, "errno=%d err=%s", serrno, strerror(serrno).c_str());
         } else {
-            _log_trace(myLog, "errno=%d err=%s We are closing this connection now.", serrno, strerror(serrno));
+            _log_trace(myLog, "errno=%d err=%s We are closing this connection now.", serrno, strerror(serrno).c_str());
             HandleError();
         }
     }
@@ -261,7 +261,7 @@ void TCPConn::HandleWrite() {
         int serrno = errno;
 
         if (EVUTIL_ERR_RW_RETRIABLE(serrno)) {
-            _log_warn(myLog, "TCPConn::HandleWrite errno=%d err=%s", serrno, strerror(serrno));
+            _log_warn(myLog, "TCPConn::HandleWrite errno=%d err=%s", serrno, strerror(serrno).c_str());
         } else {
             HandleError();
         }

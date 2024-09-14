@@ -95,7 +95,7 @@ void EventLoop::Run() {
         _log_err(myLog, "event_base_dispatch error: no event registered");
     } else if (rc == -1) {
         int serrno = errno;
-        _log_err(myLog, "event_base_dispatch error=%d err=%s", serrno, strerror(serrno));
+        _log_err(myLog, "event_base_dispatch error=%d err=%s", serrno, strerror(serrno).c_str());
     }
 
     // Make sure watcher_ does construct, initialize and destruct in the same thread.

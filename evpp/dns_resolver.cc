@@ -134,7 +134,7 @@ void DNSResolver::OnResolved(int errcode, struct addrinfo* addr) {
             _log_warn(myLog, "DNS resolve cancel, may be timeout");
         }
 
-        _log_warn(myLog, "delete DNS base. errcode=%d err=%s", errcode, strerror(errcode));
+        _log_warn(myLog, "delete DNS base. errcode=%d err=%s", errcode, strerror(errcode).c_str());
         evdns_base_free(dnsbase_, 0);
         dnsbase_ = nullptr;
         OnResolved();
