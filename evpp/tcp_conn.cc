@@ -51,14 +51,20 @@ TCPConn::~TCPConn() {
 void TCPConn::Close() {
     _log_trace(myLog, "fd=%d status=%s addr=%s", fd_, StatusToString().c_str(), AddrToString().c_str());
     status_ = kDisconnecting;
-    auto c = shared_from_this();
-    auto f = [c]() {
-        assert(c->loop_->IsInLoopThread());
-        c->HandleClose();
-    };
 
+    if (loop_->IsInLoopThread()) {
+        HandleClose();
+    } else {
+        auto c = shared_from_this();
+        auto f = [c]() {
+            assert(c->loop_->IsInLoopThread());
+            c->HandleClose();
+        };
+
+        loop_->QueueInLoop(f);
+    }
     // Use QueueInLoop to fix TCPClient::Close bug when the application delete TCPClient in callback
-    loop_->QueueInLoop(f);
+    // loop_->QueueInLoop(f);
 }
 
 void TCPConn::Send(const std::string& d) {
@@ -270,17 +276,19 @@ void TCPConn::HandleWrite() {
 
 void TCPConn::DelayClose() {
     assert(loop_->IsInLoopThread());
-    _log_trace(myLog, "addr=%s fd=%d status_=%d", AddrToString().c_str(), fd_, StatusToString().c_str());
+    _log_trace(myLog, "DelayClose! addr=%s fd=%d status_=%d",
+               AddrToString().c_str(), fd_, StatusToString().c_str());
     status_ = kDisconnecting;
     delay_close_timer_.reset();
     HandleClose();
 }
 
 void TCPConn::HandleClose() {
-    _log_warn(myLog, "addr=%s fd=%d status_=%s", AddrToString().c_str(), fd_, StatusToString().c_str());
 
     // Avoid multi calling
     if (status_ == kDisconnected) {
+        _log_warn(myLog, "HandleClose! addr=%s fd=%d status_=%s",
+                  AddrToString().c_str(), fd_, StatusToString().c_str());
         return;
     }
 
@@ -312,7 +320,7 @@ void TCPConn::HandleClose() {
     if (close_fn_) {
         close_fn_(conn);
     }
-    _log_warn(myLog, "addr=%s fd=%d status_=%s use_count=%d",
+    _log_warn(myLog, "HandleClose! addr=%s fd=%d status_=%s use_count=%d",
                AddrToString().c_str(), fd_, StatusToString().c_str(), conn.use_count());
     status_ = kDisconnected;
 }

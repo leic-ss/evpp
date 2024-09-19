@@ -28,7 +28,7 @@ namespace {
         client->set_reconnect_interval(evpp::Duration(0.1));
         client->SetConnectionCallback(&OnClientConnection);
         client->Connect();
-        loop->RunAfter(evpp::Duration(1.0), std::bind(&evpp::TCPClient::Disconnect, client));
+        loop->RunAfter(evpp::Duration(1.0), std::bind(&evpp::TCPClient::Disconnect, client, false));
         return client;
     }
 }

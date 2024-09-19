@@ -8,6 +8,9 @@
 #include "evpp/fd_channel.h"
 #include "evpp/connector.h"
 
+#include <condition_variable>
+#include <mutex>
+
 namespace evpp {
 std::atomic<uint64_t> id;
 TCPClient::TCPClient(EventLoop* l, const std::string& raddr, const std::string& n)
@@ -57,9 +60,33 @@ void TCPClient::Connect() {
     loop_->RunInLoop(f);
 }
 
-void TCPClient::Disconnect() {
+void TCPClient::Disconnect(bool wait) {
     // DLOG_TRACE;
-    loop_->RunInLoop(std::bind(&TCPClient::DisconnectInLoop, this));
+    if (!wait) {
+        loop_->RunInLoop(std::bind(&TCPClient::DisconnectInLoop, this));
+    } else {
+        std::mutex mtx;
+        std::condition_variable cond;
+        // lock
+        std::unique_lock<std::mutex> lock(mtx);
+
+        auto func = [&cond, &mtx, this] () {
+
+            DisconnectInLoop();
+            // lock
+            do {
+                // make sure cond reach wait
+                std::lock_guard<std::mutex> guard(mtx);
+            } while (0);
+            // notify
+            cond.notify_one();
+            // done
+        };
+
+        loop_->RunInLoop(func);
+
+        cond.wait(lock);        
+    }
 }
 
 void TCPClient::DisconnectInLoop() {
@@ -110,10 +137,11 @@ void TCPClient::OnConnection(evpp_socket_t sockfd, const std::string& laddr) {
         return;
     }
 
-    _log_trace(myLog, "Successfully connected to %s", remote_addr_.c_str());
+    _log_warn(myLog, "Successfully connected to %s", remote_addr_.c_str());
     assert(loop_->IsInLoopThread());
     TCPConnPtr c = TCPConnPtr(new TCPConn(loop_, name_, sockfd, laddr, remote_addr_, id++));
     c->set_type(TCPConn::kOutgoing);
+    c->SetLogger(myLog);
     c->SetMessageCallback(msg_fn_);
     c->SetConnectionCallback(conn_fn_);
     c->SetCloseCallback(std::bind(&TCPClient::OnRemoveConnection, this, std::placeholders::_1));
@@ -130,6 +158,8 @@ void TCPClient::OnRemoveConnection(const TCPConnPtr& c) {
     assert(c.get() == conn_.get());
     assert(loop_->IsInLoopThread());
     conn_.reset();
+    _log_warn(myLog, "OnRemoveConnection %s, auto_reconnect_: %s",
+              remote_addr_.c_str(), auto_reconnect_.load() ? "true" : "false");
     if (auto_reconnect_.load()) {
         Reconnect();
     }

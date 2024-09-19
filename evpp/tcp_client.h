@@ -49,7 +49,7 @@ public:
 
     // @brief Disconnect from the remote server. When the connection is
     //  broken down, the connection callback will be invoked.
-    void Disconnect();
+    void Disconnect(bool wait=false);
 public:
     // Set a connection event relative callback when the TCPClient
     // establishes a connection or an exist connection breaks down or failed to establish a connection.
