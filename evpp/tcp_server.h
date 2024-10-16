@@ -77,7 +77,9 @@ public:
     // @brief Stop the TCP server
     // @param cb - the callback cb will be invoked when
     //  the TCP server is totally stopped
-    void Stop(DoneCallback cb = DoneCallback());
+    // void Stop(DoneCallback cb = DoneCallback());
+
+    void Stop(bool wait_thread_exited = false, DoneCallback cb = DoneCallback());
 
     // @brief Reinitialize some data fields after a fork
     void AfterFork();

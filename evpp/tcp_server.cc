@@ -5,6 +5,9 @@
 #include "evpp/tcp_conn.h"
 #include "evpp/libevent.h"
 
+#include <condition_variable>
+#include <mutex>
+
 namespace evpp {
 TCPServer::TCPServer(EventLoop* loop,
                      const std::string& laddr,
@@ -71,13 +74,48 @@ bool TCPServer::Start() {
     return rc;
 }
 
-void TCPServer::Stop(DoneCallback on_stopped_cb) {
-    _log_trace(myLog, "Entering ...");
+// void TCPServer::Stop(DoneCallback on_stopped_cb) {
+//     _log_trace(myLog, "Entering ...");
+//     assert(status_ == kRunning);
+//     status_.store(kStopping);
+//     substatus_.store(kStoppingListener);
+//     loop_->RunInLoop(std::bind(&TCPServer::StopInLoop, this, on_stopped_cb));
+//     _log_trace(myLog, "Leaving ...");
+// }
+
+void TCPServer::Stop(bool wait_thread_exited, DoneCallback on_stopped_cb)
+{
     assert(status_ == kRunning);
     status_.store(kStopping);
     substatus_.store(kStoppingListener);
-    loop_->RunInLoop(std::bind(&TCPServer::StopInLoop, this, on_stopped_cb));
-    _log_trace(myLog, "Leaving ...");
+
+    if (!wait_thread_exited) {
+        loop_->RunInLoop(std::bind(&TCPServer::StopInLoop, this, on_stopped_cb));
+    } else {
+        std::mutex mtx;
+        std::condition_variable cond;
+        // lock
+        std::unique_lock<std::mutex> lock(mtx);
+
+        auto func = [&cond, &mtx, this, on_stopped_cb] () {
+
+            StopInLoop(on_stopped_cb);
+            // lock
+            do {
+                // make sure cond reach wait
+                std::lock_guard<std::mutex> guard(mtx);
+            } while (0);
+            // notify
+            cond.notify_one();
+            // done
+        };
+
+        loop_->RunInLoop(func);
+
+        cond.wait(lock);        
+    }
+
+    return ;
 }
 
 void TCPServer::StopInLoop(DoneCallback on_stopped_cb) {
