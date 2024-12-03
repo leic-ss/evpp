@@ -14,15 +14,16 @@ static void HandleHTTPResponse(const std::shared_ptr<evpp::httpc::Response>& res
     // LOG_INFO << "http_code=" << response->http_code() << " [" << response->body().ToString() << "]";
     std::string header = response->FindHeader("Connection");
     // LOG_INFO << "HTTP HEADER Connection=" << header;
+    fprintf(stderr, "%s", response->body().ToString().c_str());
     responsed = true;
     assert(request == response->request());
     delete request; // The request MUST BE deleted in EventLoop thread.
 }
 
 int main(int argc, char* argv[]) {
-    google::InitGoogleLogging(argv[0]);
-    FLAGS_stderrthreshold = 0;
-    FLAGS_minloglevel=0;
+    // google::InitGoogleLogging(argv[0]);
+    // FLAGS_stderrthreshold = 0;
+    // FLAGS_minloglevel=0;
 
     evpp::EventLoopThread t;
     t.Start(true);

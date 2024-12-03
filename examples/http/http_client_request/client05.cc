@@ -12,8 +12,8 @@
 static int responsed = 0;
 static void HandleHTTPResponse(const std::shared_ptr<evpp::httpc::Response>& response, evpp::httpc::PostRequest* request) {
     // LOG_INFO << "http_code=" << response->http_code()
-        << " URL=http://" << request->host() << request->uri()
-        << " [" << response->body().ToString() << "]";
+    //    << " URL=http://" << request->host() << request->uri()
+    //    << " [" << response->body().ToString() << "]";
     const char* header = response->FindHeader("Connection");
     if (header) {
         // LOG_INFO << "HTTP HEADER Connection=" << header;
